@@ -1,9 +1,8 @@
 import streamlit as st
 from groq import Groq
 
-GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
-
-client = Groq(api_key=GROQ_API_KEY)
+# Load API key from Streamlit Secrets
+client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 def clean_text(text):
     if not text:
@@ -13,7 +12,7 @@ def clean_text(text):
 def get_career_advice(interests, skills, education, goals):
 
     if not all([interests, skills, education, goals]):
-        return "⚠️ All fields must be filled."
+        return "⚠️ Please fill all fields."
 
     prompt = f"""
 You are an AI career counselor for Indian students.
@@ -24,7 +23,7 @@ Education: {education}
 Career Goals: {goals}
 
 Provide:
-- 4 career paths
+- 4 career options
 - required skills
 - missing skills
 - roadmap steps
@@ -36,14 +35,13 @@ Provide:
 
     try:
         response = client.chat.completions.create(
-            model="llama3-70b-8192",   # ✅ New working model
+            model="llama3-groq-8b-8192-tool-use-preview",  # ✅ NEW MODEL
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
 
     except Exception as e:
         return f"❌ Error: {e}"
-
 
 st.set_page_config(page_title="AI Career Guidance", page_icon="🚀")
 st.title("🚀 AI Career Guidance System")
@@ -58,9 +56,9 @@ with st.form("career_form"):
 
 if submit:
     if not all([name.strip(), interests.strip(), skills.strip(), education.strip(), goals.strip()]):
-        st.error("⚠️ Fill all fields!")
+        st.error("⚠️ Please fill all fields!")
     else:
-        st.success("Generating your career guidance...")
+        st.success("Generating your personalized career guidance...")
         advice = get_career_advice(
             clean_text(interests),
             clean_text(skills),
