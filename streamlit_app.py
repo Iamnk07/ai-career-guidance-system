@@ -1,67 +1,104 @@
 import streamlit as st
-import google.generativeai as genai
-import os
+import requests
 import re
 
-# Load API key from Streamlit Secrets
-API_KEY = st.secrets["GOOGLE_API_KEY"]
+# ----------------------------
+#  SETTINGS (PUT YOUR KEY HERE)
+# ----------------------------
+GROQ_API_KEY = "YOUR_GROQ_API_KEY"   # Replace with your real key
+MODEL_NAME = "llama-3.1-70b-versatile"
 
-# Configure Google API
-genai.configure(api_key=API_KEY)
+API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
-# Use correct FREE model
-MODEL_NAME = "gemini-1.5-flash"
+# ----------------------------
+# Helper Functions
+# ----------------------------
 
+def clean_input(text):
+    return re.sub(r'[^\w\s]', '', text).strip() if text else ""
 
-def clean_text(text):
-    return re.sub(r"[^\w\s]", "", text).strip()
+def get_career_advice(interests, skills, education, goals):
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-
-def get_career_advice(name, skills, education, goals):
     prompt = f"""
-    You are an expert career counselor for Indian students.
+You are an expert career counselor for Indian B.Tech students.
 
-    Name: {name}
-    Skills: {skills}
-    Education: {education}
-    Goals: {goals}
+Give highly personalized, clear, practical career guidance based on:
+- Interests: {interests}
+- Skills: {skills}
+- Education: {education}
+- Career Goals: {goals}
 
-    Provide:
-    - 4 career paths with job description
-    - Required skills
-    - Skill gaps
-    - Step-by-step roadmap
-    - Salary (INR)
-    - Market insights
-    - Challenges and solutions
-    - Motivational advice
-    """
+Requirements:
+1. Suggest **4 career paths** with:
+   - Job role & description
+   - Required skills
+   - Missing skills based on user's input
+   - Roadmap (3–5 steps)
+   - Salary (INR)
+   - Market demand in India
+2. Add:
+   - Resume advice
+   - Projects ideas
+   - Interview tips
+   - Free learning resources
+3. Format clearly with headings and bullet points.
+"""
+
+    data = {
+        "model": MODEL_NAME,
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.8
+    }
 
     try:
-        model = genai.GenerativeModel(MODEL_NAME)
-        response = model.generate_content(prompt)
-        return response.text
+        response = requests.post(API_URL, json=data, headers=headers)
+        result = response.json()
+
+        if "choices" in result:
+            return result["choices"][0]["message"]["content"]
+        else:
+            return f"API Error: {result}"
+
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return f"Error: {str(e)}"
 
+# ----------------------------
+# STREAMLIT UI
+# ----------------------------
 
-# Streamlit UI
+st.set_page_config(page_title="AI Career Guide", page_icon="🚀")
+
 st.title("🚀 AI Career Guidance System")
+st.subheader("Get personalized career suggestions powered by Llama-3")
 
-name = st.text_input("Your Name")
-skills = st.text_input("Your Skills")
-education = st.text_input("Your Education")
-goals = st.text_input("Your Career Goal")
+with st.form("career_form"):
+    user_name = st.text_input("Your Name")
+    interests = st.text_input("Your Interests (AI, web dev, etc.)")
+    skills = st.text_input("Your Skills (Python, teamwork)")
+    education = st.text_input("Education (e.g., B.Tech CSE)")
+    goals = st.text_input("Career Goals")
 
-if st.button("Get Career Advice"):
-    if not (name and skills and education and goals):
-        st.error("Please fill all fields.")
+    submit = st.form_submit_button("Get Career Advice")
+
+if submit:
+    if not all([user_name, interests, skills, education, goals]):
+        st.error("⚠ Please fill all fields")
     else:
-        with st.spinner("Generating career advice..."):
-            output = get_career_advice(
-                clean_text(name), clean_text(skills),
-                clean_text(education), clean_text(goals)
-            )
-        st.success("Career advice generated!")
-        st.write(output)
+        st.success("Career advice generated successfully ✔")
+
+        interests = clean_input(interests)
+        skills = clean_input(skills)
+        education = clean_input(education)
+        goals = clean_input(goals)
+
+        with st.spinner("Generating advice..."):
+            advice = get_career_advice(interests, skills, education, goals)
+
+        st.markdown(advice)
+
+
 
