@@ -16,26 +16,27 @@ def get_career_advice(interests, skills, education, goals):
 
     prompt = f"""
 You are an AI career counselor for Indian students.
+Provide detailed guidance based on:
 
 Interests: {interests}
 Skills: {skills}
 Education: {education}
 Career Goals: {goals}
 
-Provide:
-- 4 career options
-- required skills
-- missing skills
-- roadmap steps
-- salary in INR
-- resources
-- resume tips
-- interview tips
+Give:
+- 4 career paths
+- Required skills
+- Skill gaps
+- Roadmap steps
+- Salary (INR)
+- Learning resources
+- Resume tips
+- Interview tips
 """
 
     try:
         response = client.chat.completions.create(
-            model="llama3-groq-8b-8192-tool-use-preview",  # ✅ NEW MODEL
+            model="llama3.1-8b-instant",   # ✅ NEW WORKING MODEL
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
@@ -43,6 +44,8 @@ Provide:
     except Exception as e:
         return f"❌ Error: {e}"
 
+
+# UI
 st.set_page_config(page_title="AI Career Guidance", page_icon="🚀")
 st.title("🚀 AI Career Guidance System")
 
@@ -56,7 +59,7 @@ with st.form("career_form"):
 
 if submit:
     if not all([name.strip(), interests.strip(), skills.strip(), education.strip(), goals.strip()]):
-        st.error("⚠️ Please fill all fields!")
+        st.error("⚠️ Fill all fields!")
     else:
         st.success("Generating your personalized career guidance...")
         advice = get_career_advice(
