@@ -1,12 +1,23 @@
 import streamlit as st
 from groq import Groq
 
-# Load Groq API key
-GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+# ✅ Cache the Groq client so it loads only once
+@st.cache_resource
+def get_client():
+    return Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-client = Groq(api_key=GROQ_API_KEY)
+client = get_client()
+
+def clean_text(text):
+    if not text:
+        return ""
+    return text.strip()
 
 def get_career_advice(interests, skills, education, goals):
+
+    if not all([interests, skills, education, goals]):
+        return "⚠️ Please fill all fields."
+
     prompt = f"""
 You are an AI career counselor for Indian students.
 
@@ -15,23 +26,24 @@ Skills: {skills}
 Education: {education}
 Career Goals: {goals}
 
-Provide detailed guidance including:
-- 4 suitable career options
-- Required skills
-- Missing skills
-- Roadmap (step-by-step)
-- Salary in INR
-- Free resources
-- Resume & interview tips
-Format neatly with bullet points.
+Provide:
+- 4 career options
+- required skills
+- missing skills
+- roadmap steps
+- salary in INR
+- resources
+- resume tips
+- interview tips
 """
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-70b-instruct",  # ✅ Correct working model
+            model="llama3-groq-8b-8192-tool-use-preview",
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
+
     except Exception as e:
         return f"❌ Error: {e}"
 
@@ -52,5 +64,11 @@ if submit:
         st.error("⚠️ Please fill all fields!")
     else:
         st.success("Generating your personalized career guidance...")
-        advice = get_career_advice(interests, skills, education, goals)
+        advice = get_career_advice(
+            clean_text(interests),
+            clean_text(skills),
+            clean_text(education),
+            clean_text(goals)
+        )
         st.markdown(advice)
+
