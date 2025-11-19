@@ -3,6 +3,7 @@ from groq import Groq
 from datetime import datetime
 from fpdf import FPDF
 import io
+import time
 
 # -----------------------------------------------------
 # PAGE CONFIG
@@ -24,9 +25,14 @@ if "history" not in st.session_state:
 
 if "chat_messages" not in st.session_state:
     st.session_state["chat_messages"] = [
-        {"role": "assistant",
-         "content": "Hi! I'm your AI career assistant. Ask me anything about careers, skills, or learning paths."}
+        {
+            "role": "assistant",
+            "content": "Hi! I'm your AI career assistant. Ask me anything about careers, skills, or learning paths."
+        }
     ]
+
+if "splash_done" not in st.session_state:
+    st.session_state["splash_done"] = False
 
 # -----------------------------------------------------
 # THEME / CSS
@@ -34,8 +40,8 @@ if "chat_messages" not in st.session_state:
 def apply_theme():
     theme = st.session_state.get("theme", "Dark")
     if theme == "Dark":
-        bg_color = "#0e1117"
-        card_bg = "#1e1e1e"
+        bg_color = "#050814"
+        card_bg = "#101320"
         text_color = "#e4e4e4"
     else:
         bg_color = "#f5f5f5"
@@ -65,6 +71,128 @@ def apply_theme():
 apply_theme()
 
 # -----------------------------------------------------
+# SPLASH SCREEN (4 SECONDS)
+# -----------------------------------------------------
+def show_splash():
+    splash_html = """
+    <style>
+    .splash-container {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at top left, #4f46e5, transparent 40%),
+                    radial-gradient(circle at bottom right, #ec4899, transparent 40%),
+                    #020617;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        z-index: 9999;
+    }
+    .splash-content {
+        text-align: center;
+        color: #e5e7eb;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .splash-title {
+        font-size: 2.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+    .splash-subtitle {
+        font-size: 1rem;
+        opacity: 0.8;
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .orb {
+        position: absolute;
+        border-radius: 999px;
+        filter: blur(18px);
+        opacity: 0.7;
+        mix-blend-mode: screen;
+        background: conic-gradient(from 180deg at 50% 50%, #22d3ee, #4f46e5, #a855f7, #22d3ee);
+        animation: float 9s ease-in-out infinite alternate;
+    }
+    .orb.small {
+        width: 160px;
+        height: 160px;
+    }
+    .orb.medium {
+        width: 260px;
+        height: 260px;
+    }
+    .orb.large {
+        width: 360px;
+        height: 360px;
+    }
+    .orb.one { top: -60px; left: -40px; animation-delay: 0s; }
+    .orb.two { bottom: -80px; right: -40px; animation-delay: 1.5s; }
+    .orb.three { top: 40%; left: 65%; animation-delay: 3s; }
+
+    @keyframes float {
+        0%   { transform: translate3d(0, 0, 0) scale(1); }
+        50%  { transform: translate3d(30px, -25px, 40px) scale(1.1); }
+        100% { transform: translate3d(-20px, 30px, -40px) scale(0.95); }
+    }
+
+    .glow-ring {
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        border: 1px solid rgba(148,163,184,0.25);
+        box-shadow:
+            0 0 60px rgba(129,140,248,0.4),
+            0 0 120px rgba(236,72,153,0.3);
+        margin: 0 auto 1.6rem auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .ring-inner {
+        width: 70%;
+        height: 70%;
+        border-radius: 999px;
+        background: radial-gradient(circle at 0% 0%, #22c55e, transparent 40%),
+                    radial-gradient(circle at 100% 100%, #38bdf8, transparent 40%),
+                    #020617;
+        opacity: 0.9;
+    }
+    </style>
+
+    <div class="splash-container">
+        <div class="orb small one"></div>
+        <div class="orb medium two"></div>
+        <div class="orb large three"></div>
+
+        <div class="splash-content">
+            <div class="glow-ring">
+                <div class="ring-inner"></div>
+            </div>
+            <div class="splash-title">WELCOME TO</div>
+            <div class="splash-title" style="font-size:2rem; letter-spacing:0.18em;">
+                AI CAREER GUIDANCE
+            </div>
+            <p class="splash-subtitle">
+                Smart, personalized roadmap for your future career — powered by AI.
+            </p>
+        </div>
+    </div>
+    """
+    st.markdown(splash_html, unsafe_allow_html=True)
+
+# show splash only once per session
+if not st.session_state["splash_done"]:
+    show_splash()
+    time.sleep(4)
+    st.session_state["splash_done"] = True
+    st.rerun()
+
+# -----------------------------------------------------
 # GROQ CLIENT
 # -----------------------------------------------------
 @st.cache_resource
@@ -84,7 +212,7 @@ def call_groq(prompt: str) -> str:
     """Core function to call Groq chat completion."""
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+            model="openai/gpt-oss-20b",  # ✅ model you have access to
             messages=[{"role": "user", "content": prompt}],
         )
         return response.choices[0].message.content
@@ -147,7 +275,6 @@ def generate_pdf(name, interests, skills, education, goals, advice) -> bytes:
     pdf.cell(0, 8, "Guidance:", ln=1)
 
     pdf.set_font("Arial", "", 11)
-    # remove very fancy characters to avoid font issues
     safe_advice = advice.replace("•", "-")
     pdf.multi_cell(0, 6, safe_advice)
 
@@ -157,20 +284,47 @@ def generate_pdf(name, interests, skills, education, goals, advice) -> bytes:
     return buffer.read()
 
 # -----------------------------------------------------
-# SIDEBAR NAVIGATION
+# NAVBAR (TOP)
 # -----------------------------------------------------
-with st.sidebar:
-    st.title("🎯 AI Career Guide")
+st.markdown(
+    """
+    <style>
+    .nav-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.2rem;
+    }
+    .nav-title {
+        text-align:center;
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    .nav-subtitle {
+        text-align:center;
+        font-size: 0.9rem;
+        opacity: 0.7;
+        margin-bottom: 0.6rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-    page = st.radio(
-        "Navigate",
-        ["Home", "Career Guidance", "Career Chat", "History",
-         "Resume Tips", "Interview Tips", "Settings"],
-        index=1,
-    )
+st.markdown('<div class="nav-title">🚀 AI Career Guidance</div>', unsafe_allow_html=True)
+st.markdown(
+    '<div class="nav-subtitle">Plan your career path with AI – simple, fast, personalized.</div>',
+    unsafe_allow_html=True,
+)
 
-    st.markdown("---")
-    st.caption("Built with Streamlit + Groq")
+page = st.radio(
+    "",
+    ["Home", "Career Guidance", "Career Chat", "History", "About", "Contact", "Settings"],
+    horizontal=True,
+    key="main_nav",
+)
+
+st.write("")  # small spacing
 
 # -----------------------------------------------------
 # PAGE RENDER FUNCTIONS
@@ -178,43 +332,40 @@ with st.sidebar:
 def render_home():
     st.markdown(
         """
-        <div style="text-align:center; padding: 30px 10px;">
-            <h1>🚀 Welcome to AI Career Guidance System</h1>
-            <p style="font-size:18px; max-width:700px; margin: 0 auto;">
-                This app helps you explore career paths, understand required skills, and
-                plan your roadmap using AI. Use the sidebar to navigate:
-                <br><br>
-                <b>Career Guidance</b> – Get a full career plan from your details. <br>
-                <b>Career Chat</b> – Chat with an AI about any career doubt. <br>
-                <b>History</b> – See your previous results for this session.
+        <div style="text-align:center; padding: 20px 10px;">
+            <h2>👋 Welcome!</h2>
+            <p style="font-size:16px; max-width:720px; margin: 0 auto;">
+                This platform helps you explore career options, understand required skills,
+                and build a roadmap using AI. <br><br>
+                Start with <b>Career Guidance</b> to get a full AI-generated plan, or use
+                <b>Career Chat</b> to ask any career question.
             </p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("✨ Go to Career Guidance", use_container_width=True):
+            st.session_state["main_nav"] = "Career Guidance"
+            st.rerun()
+    with col2:
+        if st.button("💬 Open Career Chat", use_container_width=True):
+            st.session_state["main_nav"] = "Career Chat"
+            st.rerun()
+
 
 def render_career_guidance():
-    st.markdown(
-        """
-        <div style="text-align:center; padding: 10px 0 20px 0;">
-            <h2>🧠 AI Career Guidance Form</h2>
-            <p>Fill the form and get a complete career roadmap, skills, salary range & more.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.subheader("🧠 AI Career Guidance Form")
 
-    with st.container():
-        st.subheader("📝 Enter Your Details")
+    name = st.text_input("Your Name")
+    interests = st.text_input("Your Interests (e.g. Coding, Finance, Design)")
+    skills = st.text_input("Your Skills (e.g. Python, Excel, Communication)")
+    education = st.text_input("Your Education (e.g. B.Tech CSE, B.Com)")
+    goals = st.text_input("Your Career Goals (e.g. DevOps Engineer, Data Scientist)")
 
-        name = st.text_input("Your Name")
-        interests = st.text_input("Your Interests (e.g. Coding, Finance, Design)")
-        skills = st.text_input("Your Skills (e.g. Python, Excel, Communication)")
-        education = st.text_input("Your Education (e.g. B.Tech CSE, B.Com)")
-        goals = st.text_input("Your Career Goals (e.g. DevOps Engineer, Data Scientist)")
-
-        submit = st.button("✨ Get Career Guidance", use_container_width=True)
+    submit = st.button("🚀 Generate Career Guidance", use_container_width=True)
 
     if submit:
         if not all([name.strip(), interests.strip(), skills.strip(), education.strip(), goals.strip()]):
@@ -229,7 +380,6 @@ def render_career_guidance():
                 clean_text(goals),
             )
 
-        # Save to history
         st.session_state["history"].append(
             {
                 "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -261,7 +411,6 @@ def render_career_guidance():
             unsafe_allow_html=True,
         )
 
-        # PDF download
         pdf_bytes = generate_pdf(name, interests, skills, education, goals, advice)
         st.download_button(
             label="📥 Download Guidance as PDF",
@@ -272,45 +421,37 @@ def render_career_guidance():
 
 
 def render_chat():
-    st.header("💬 Career Chat Assistant")
-    st.write("Ask any question about careers, skills, learning paths, or tech roles.")
+    st.subheader("💬 Career Chat Assistant")
+    st.write("Ask anything about tech roles, salaries, skills, roadmaps, or study plans.")
 
     for msg in st.session_state["chat_messages"]:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    user_input = st.chat_input("Ask your career question here...")
+    user_input = st.chat_input("Type your question here...")
     if user_input:
-        # show user message
-        st.session_state["chat_messages"].append(
-            {"role": "user", "content": user_input}
-        )
+        st.session_state["chat_messages"].append({"role": "user", "content": user_input})
         with st.chat_message("user"):
             st.markdown(user_input)
 
-        # assistant response
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 reply = career_chat_reply(user_input)
                 st.markdown(reply)
 
-        st.session_state["chat_messages"].append(
-            {"role": "assistant", "content": reply}
-        )
+        st.session_state["chat_messages"].append({"role": "assistant", "content": reply})
 
 
 def render_history():
-    st.header("📚 Session History")
+    st.subheader("📚 Session History")
 
     history = st.session_state["history"]
     if not history:
-        st.info("No history yet. Generate guidance from the **Career Guidance** page.")
+        st.info("No history yet. Generate guidance from the **Career Guidance** tab.")
         return
 
     for i, item in enumerate(reversed(history), start=1):
-        with st.expander(
-            f"{i}. {item['time']} — {item['name']} ({item['goals']})", expanded=False
-        ):
+        with st.expander(f"{i}. {item['time']} — {item['name']} ({item['goals']})"):
             st.write(f"**Interests:** {item['interests']}")
             st.write(f"**Skills:** {item['skills']}")
             st.write(f"**Education:** {item['education']}")
@@ -319,53 +460,65 @@ def render_history():
             st.markdown(item["advice"])
 
 
-def render_resume_tips():
-    st.header("📄 Resume Tips (Static)")
+def render_about():
+    st.subheader("ℹ️ About")
     st.markdown(
         """
-- Keep your resume **1 page** as a student / fresher.  
-- Add a **strong summary** with your role target (e.g. “Aspiring DevOps Engineer”).  
-- Highlight **Projects** with tech stack & outcomes.  
-- Add **Skills** section: tools, languages, frameworks.  
-- Use **action verbs**: built, implemented, automated, optimized.  
-- Include **LinkedIn / GitHub** links.  
-- Avoid long paragraphs. Use bullet points.
+This AI Career Guidance System helps students and early professionals:
+
+- Discover relevant **career options**
+- Understand **required & missing skills**
+- Get a **step-by-step roadmap**
+- Prepare for **resume** and **interviews**
+
+It is built using:
+
+- **Python + Streamlit** for the UI  
+- **Groq API (`openai/gpt-oss-20b`)** for AI  
+- Deployed on **Streamlit Community Cloud**
 """
     )
 
 
-def render_interview_tips():
-    st.header("🎤 Interview Tips (Static)")
+def render_contact():
+    st.subheader("📬 Contact")
     st.markdown(
         """
-- Practice a short **self-introduction** (60–90 seconds).  
-- Be ready to explain your **projects**: problem, solution, tech stack, impact.  
-- Revise **CS fundamentals**: DSA basics, OOP, DBMS, OS (for tech roles).  
-- Prepare for **behavioral questions** (“Tell me about a challenge…”)  
-- Do mock interviews with friends or on platforms.  
-- At the end, ask **1–2 smart questions** about the role or team.
+You can customize this section with your real contact info.
+
+**Example layout:**
+
+- 📧 Email: `yourmail@example.com`  
+- 💼 LinkedIn: `https://linkedin.com/in/your-profile`  
+- 🐙 GitHub: `https://github.com/your-username`  
+
+Update these values directly in the code to match your real details.
 """
     )
 
 
 def render_settings():
-    st.header("⚙️ Settings")
+    st.subheader("⚙️ Settings")
 
-    theme = st.radio("Theme", ["Dark", "Light"],
-                     index=0 if st.session_state["theme"] == "Dark" else 1)
+    theme = st.radio(
+        "Theme",
+        ["Dark", "Light"],
+        index=0 if st.session_state["theme"] == "Dark" else 1,
+    )
     st.session_state["theme"] = theme
 
-    if st.button("Clear Session History"):
+    if st.button("🧹 Clear Session History"):
         st.session_state["history"] = []
         st.success("History cleared for this session.")
 
-    if st.button("Reset Chat"):
+    if st.button("🔁 Reset Chat Assistant"):
         st.session_state["chat_messages"] = [
-            {"role": "assistant",
-             "content": "Hi! I'm your AI career assistant. Ask me anything about careers, skills, or learning paths."}
+            {
+                "role": "assistant",
+                "content": "Hi! I'm your AI career assistant. Ask me anything about careers, skills, or learning paths.",
+            }
         ]
         st.success("Chat reset.")
-
 
 # -----------------------------------------------------
 # ROUTER
@@ -378,9 +531,10 @@ elif page == "Career Chat":
     render_chat()
 elif page == "History":
     render_history()
-elif page == "Resume Tips":
-    render_resume_tips()
-elif page == "Interview Tips":
-    render_interview_tips()
+elif page == "About":
+    render_about()
+elif page == "Contact":
+    render_contact()
 elif page == "Settings":
     render_settings()
+
