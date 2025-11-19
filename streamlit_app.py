@@ -11,7 +11,7 @@ API_KEY = st.secrets["GOOGLE_API_KEY"]
 genai.configure(api_key=API_KEY)
 
 # Use correct model name
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
+model = genai.GenerativeModel("gemini-pro")
 
 def clean_input(text):
     return re.sub(r"[^\w\s]", "", text).strip()
