@@ -56,7 +56,7 @@ Format the output cleanly with headings and bullet points.
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-70b-versatile",  # ✅ Correct MODEL
+           model="openai/gpt-oss-20b"
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
