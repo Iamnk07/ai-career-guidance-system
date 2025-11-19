@@ -3,44 +3,65 @@ import google.generativeai as genai
 import os
 import re
 
-# Load API key from secrets
+# Load API key from Streamlit Secrets
 API_KEY = st.secrets["GOOGLE_API_KEY"]
 
+# Configure Google API
 genai.configure(api_key=API_KEY)
 
-# WORKING model for your account + old SDK
-model = genai.GenerativeModel("gemini-pro")
+# Use correct FREE model
+MODEL_NAME = "gemini-1.5-flash"
 
-def clean_input(text):
+
+def clean_text(text):
     return re.sub(r"[^\w\s]", "", text).strip()
 
-def get_career_advice(interests, skills, education, goals):
+
+def get_career_advice(name, skills, education, goals):
     prompt = f"""
-    You are a career counselor in India.
-    Interests: {interests}
+    You are an expert career counselor for Indian students.
+
+    Name: {name}
     Skills: {skills}
     Education: {education}
     Goals: {goals}
-    Give detailed career paths, skill gaps, salary, steps.
+
+    Provide:
+    - 4 career paths with job description
+    - Required skills
+    - Skill gaps
+    - Step-by-step roadmap
+    - Salary (INR)
+    - Market insights
+    - Challenges and solutions
+    - Motivational advice
     """
+
     try:
+        model = genai.GenerativeModel(MODEL_NAME)
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
         return f"❌ Error: {str(e)}"
 
-st.title("AI Career Guidance System")
+
+# Streamlit UI
+st.title("🚀 AI Career Guidance System")
 
 name = st.text_input("Your Name")
-interests = st.text_input("Your Interests")
 skills = st.text_input("Your Skills")
 education = st.text_input("Your Education")
-goals = st.text_input("Your Career Goals")
+goals = st.text_input("Your Career Goal")
 
-if st.button("Get Advice"):
-    if not all([name, interests, skills, education, goals]):
-        st.error("Fill all fields.")
+if st.button("Get Career Advice"):
+    if not (name and skills and education and goals):
+        st.error("Please fill all fields.")
     else:
-        advice = get_career_advice(interests, skills, education, goals)
-        st.write(advice)
+        with st.spinner("Generating career advice..."):
+            output = get_career_advice(
+                clean_text(name), clean_text(skills),
+                clean_text(education), clean_text(goals)
+            )
+        st.success("Career advice generated!")
+        st.write(output)
 
