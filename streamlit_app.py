@@ -12,7 +12,7 @@ API_KEY = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=API_KEY)
 
 # Use free model (works WITHOUT billing)
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 def clean_input(text):
     return re.sub(r'[^\w\s]', '', text).strip() if text else ""
