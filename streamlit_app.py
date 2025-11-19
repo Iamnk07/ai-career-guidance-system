@@ -1,51 +1,41 @@
 import streamlit as st
 from groq import Groq
 
-# Load API key from Streamlit Secrets
-client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+# Load Groq API key
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
-def clean_text(text):
-    if not text:
-        return ""
-    return text.strip()
+client = Groq(api_key=GROQ_API_KEY)
 
 def get_career_advice(interests, skills, education, goals):
-
-    if not all([interests, skills, education, goals]):
-        return "⚠️ Please fill all fields."
-
     prompt = f"""
 You are an AI career counselor for Indian students.
-Provide detailed guidance based on:
 
 Interests: {interests}
 Skills: {skills}
 Education: {education}
 Career Goals: {goals}
 
-Give:
-- 4 career paths
+Provide detailed guidance including:
+- 4 suitable career options
 - Required skills
-- Skill gaps
-- Roadmap steps
-- Salary (INR)
-- Learning resources
-- Resume tips
-- Interview tips
+- Missing skills
+- Roadmap (step-by-step)
+- Salary in INR
+- Free resources
+- Resume & interview tips
+Format neatly with bullet points.
 """
 
     try:
         response = client.chat.completions.create(
-            model="llama3.1-8b-instant",   # ✅ NEW WORKING MODEL
+            model="llama-3.1-70b-instruct",  # ✅ Correct working model
             messages=[{"role": "user", "content": prompt}]
         )
         return response.choices[0].message.content
-
     except Exception as e:
         return f"❌ Error: {e}"
 
 
-# UI
 st.set_page_config(page_title="AI Career Guidance", page_icon="🚀")
 st.title("🚀 AI Career Guidance System")
 
@@ -59,13 +49,8 @@ with st.form("career_form"):
 
 if submit:
     if not all([name.strip(), interests.strip(), skills.strip(), education.strip(), goals.strip()]):
-        st.error("⚠️ Fill all fields!")
+        st.error("⚠️ Please fill all fields!")
     else:
         st.success("Generating your personalized career guidance...")
-        advice = get_career_advice(
-            clean_text(interests),
-            clean_text(skills),
-            clean_text(education),
-            clean_text(goals)
-        )
+        advice = get_career_advice(interests, skills, education, goals)
         st.markdown(advice)
