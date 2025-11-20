@@ -33,13 +33,13 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Make main area light, sidebar dark */
+/* Main container */
 .block-container {
     padding-top: 1.2rem;
     padding-bottom: 3rem;
 }
 
-/* Dark corporate sidebar like dashboard */
+/* Dark corporate sidebar */
 section[data-testid="stSidebar"] {
     background: #020617;
     border-right: 1px solid #111827;
@@ -58,7 +58,7 @@ section[data-testid="stSidebar"] * {
     margin-bottom: 0.6rem;
 }
 .sidebar-separator {
-    border-bottom: 1px solid #1f2933;
+    border-bottom: 1px solid #1f2937;
     margin: 0.4rem 0 0.6rem 0;
 }
 
@@ -74,7 +74,7 @@ section[data-testid="stSidebar"] * {
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at 10% 20%, rgba(37,99,235,0.85), transparent 55%),
+        radial-gradient(circle at 10% 20%, rgba(37,99,235,0.9), transparent 55%),
         radial-gradient(circle at 90% 80%, rgba(14,165,233,0.9), transparent 55%),
         #020617;
     display:flex;
@@ -83,29 +83,49 @@ section[data-testid="stSidebar"] * {
     z-index:9999;
 }
 .splash-card {
+    position: relative;
     text-align:center;
     color:#e5e7eb;
-    padding: 1.8rem 2.4rem;
-    border-radius:18px;
-    background:rgba(15,23,42,0.94);
-    border:1px solid rgba(148,163,184,0.5);
+    padding: 2.2rem 2.6rem;
+    border-radius:20px;
+    background:rgba(15,23,42,0.96);
+    border:1px solid rgba(148,163,184,0.6);
     min-width:260px;
-    max-width:380px;
+    max-width:400px;
+    overflow:hidden;
+}
+.splash-tetra {
+    position:absolute;
+    inset:-40%;
+    opacity:0.35;
+    background:
+        conic-gradient(from 180deg, #2563eb, #22c55e, #f97316, #ec4899, #2563eb);
+    clip-path: polygon(15% 0%, 85% 0%, 100% 40%, 85% 100%, 15% 100%, 0% 40%);
+    animation: splash-rotate 14s linear infinite;
+    transform-origin:50% 50%;
 }
 .splash-title {
+    position:relative;
     font-size:clamp(1.6rem, 3vw, 2.1rem);
     font-weight:650;
     margin-bottom:0.4rem;
 }
 .splash-sub {
+    position:relative;
     font-size:0.9rem;
     color:#9ca3af;
     margin-bottom:0.4rem;
 }
 .splash-author {
+    position:relative;
     font-size:0.8rem;
     color:#cbd5f5;
     opacity:0.9;
+}
+@keyframes splash-rotate {
+    0% { transform: rotate3d(1,1,0,18deg); }
+    50% { transform: rotate3d(1,1,0,38deg); }
+    100% { transform: rotate3d(1,1,0,18deg); }
 }
 
 /* Home header text */
@@ -120,7 +140,7 @@ section[data-testid="stSidebar"] * {
     margin-bottom:1.3rem;
 }
 
-/* Hero section with tetragon */
+/* Hero */
 .hero {
     display:flex;
     flex-wrap:wrap;
@@ -148,7 +168,7 @@ section[data-testid="stSidebar"] * {
     max-width:460px;
 }
 
-/* Tetragonal animated design */
+/* 3D tetragon design on home */
 .tetra-wrapper {
     display:flex;
     justify-content:center;
@@ -202,7 +222,7 @@ section[data-testid="stSidebar"] * {
     100% { transform: rotate3d(0.9,1.1,0,24deg) translateY(4px); }
 }
 
-/* Two-box layout (Career Chart / AI Guidance) */
+/* Two cards row */
 .two-box-row {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -271,6 +291,13 @@ section[data-testid="stSidebar"] * {
 .footer-link {
     color:#9ca3af;
 }
+.footer-link a {
+    color:#9ca3af;
+    text-decoration:none;
+}
+.footer-link a:hover {
+    text-decoration:underline;
+}
 
 /* Mobile tweaks */
 @media (max-width: 640px) {
@@ -290,12 +317,13 @@ section[data-testid="stSidebar"] * {
 st.markdown(CSS, unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# SPLASH (ONCE PER SESSION)
+# SPLASH (ONCE PER SESSION, 3D-ISH ANIMATED)
 # -----------------------------------------------------
 def show_splash():
     html = """
     <div class="splash-layer">
       <div class="splash-card">
+        <div class="splash-tetra"></div>
         <div class="splash-title">Welcome to AI Career Guidance</div>
         <div class="splash-sub">Your AI companion for career clarity and growth.</div>
         <div class="splash-author">Created by Niyaz</div>
@@ -353,8 +381,31 @@ Format the output clearly using headings and bullet points.
 """
     return call_groq(prompt)
 
+def get_career_chart_overview(name, skills, interests):
+    prompt = f"""
+You are an AI career mentor. Create a friendly, clear career chart overview for this user.
+
+Name: {name}
+Skills: {skills}
+Interests: {interests}
+
+Provide:
+
+1. A short summary of their profile  
+2. 3–5 suitable career paths  
+3. A simple "career chart" style text, like:
+   - Stage 1: Where they are now
+   - Stage 2: Next 1–2 roles
+   - Stage 3: Senior roles
+4. Key skills they should focus on  
+5. Suggested learning plan (bullet points)
+
+Use headings and bullet points. Keep it concise but useful.
+"""
+    return call_groq(prompt)
+
 # -----------------------------------------------------
-# SIDEBAR NAV (DARK CORPORATE, LIKE CHATGPT)
+# SIDEBAR NAV (DARK CORPORATE)
 # -----------------------------------------------------
 nav_items = [
     "Home",
@@ -381,23 +432,23 @@ with st.sidebar:
     st.session_state["active_page"] = choice
 
 # -----------------------------------------------------
-# HOME PAGE (3D TETRAGON + CAREER CHART BOX + AI GUIDANCE BOX + TOP CAREERS)
+# HOME PAGE
 # -----------------------------------------------------
 def page_home():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
 
-    # Header text
+    # Header
     st.markdown(
         """
         <div class="home-header-title">Welcome to AI Career Guidance</div>
         <div class="home-header-sub">
-            Discover your best career path with AI-powered suggestions tailored to your skills and interests.
+            Discover your best career path with AI-powered insights based on your interests and skills.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Hero with 3D tetragon on the right
+    # Hero
     st.markdown('<div class="hero">', unsafe_allow_html=True)
     col_left, col_right = st.columns([1.2, 1], gap="large")
 
@@ -409,9 +460,8 @@ def page_home():
                 Find your next step with confidence.
               </div>
               <div class="hero-left-sub">
-                Our AI analyzes your background and goals to suggest roles, skills, and a clear roadmap.
-                Start with a quick overview of your current position using the career chart, then explore
-                detailed guidance powered by AI.
+                Start with a quick overview of your career options using the Career Chart,
+                then use AI Career Guidance for a detailed roadmap tailored to your goals.
               </div>
             </div>
             """,
@@ -428,7 +478,7 @@ def page_home():
                     <div class="tetra-orb two"></div>
                     <div class="tetra-orb three"></div>
                     <div class="tetra-inner">
-                        AI-driven<br/>career intelligence
+                        3D Career<br/>Intelligence
                     </div>
                 </div>
               </div>
@@ -439,54 +489,47 @@ def page_home():
 
     st.markdown("</div>", unsafe_allow_html=True)  # close hero
 
-    # Two-box row: left = Career Chart, right = AI Guidance
+    # Two cards row: Career Chart + AI Guidance
     st.markdown('<div class="two-box-row">', unsafe_allow_html=True)
 
-    # Left: career chart box
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("**Career Chart (Overview)**", unsafe_allow_html=True)
+        st.markdown("### 📊 Career Chart", unsafe_allow_html=True)
         st.write(
             """
-A quick view of common career paths in tech and business:
+Get a high-level view of your possible career paths based on your
+current skills and interests.
 
-- **Foundation Stage**: Student / Fresher  
-- **Skill Building**: Intern / Trainee / Junior Engineer  
-- **Core Role**: Software Engineer / Analyst / Designer  
-- **Growth**: Senior, Lead, Architect, Manager  
+Use this when you want a quick overview of where you can go.
             """
         )
-        if st.button("View Full Career Chart", key="home_career_chart_btn", use_container_width=True):
+        if st.button("Open Career Chart", key="home_career_chart_btn", use_container_width=True):
             st.session_state["active_page"] = "Career Chart"
-            st.experimental_rerun()
+            st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Right: AI career guidance box
     with st.container():
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown("**AI Career Guidance**", unsafe_allow_html=True)
+        st.markdown("### 🧠 AI Career Guidance", unsafe_allow_html=True)
         st.write(
             """
-Let the AI analyze your interests, skills, and goals to suggest:
-
-- Best matching roles  
-- Skills you should learn next  
-- Roadmap and resources  
+Let the AI analyze your profile and generate a full career guidance report:
+roles, skills, roadmap, salary range, and resources.
             """
         )
-        if st.button("Start AI Career Guidance", key="home_ai_btn", use_container_width=True):
+        if st.button("Start AI Guidance", key="home_ai_btn", use_container_width=True):
             st.session_state["active_page"] = "AI Career Guidance"
-            st.experimental_rerun()
+            st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)  # close two-box-row
 
-    # Top career suggestions section
+    # Top careers section
     st.markdown('<div class="section">', unsafe_allow_html=True)
     st.markdown(
         """
-        <div class="section-title">Top career suggestions</div>
-        <div class="section-sub">Popular, high-demand roles you can explore with strong future growth.</div>
+        <div class="section-title">Top careers right now</div>
+        <div class="section-sub">High-demand roles you can explore today.</div>
         """,
         unsafe_allow_html=True,
     )
@@ -497,71 +540,70 @@ Let the AI analyze your interests, skills, and goals to suggest:
             <strong>Data Scientist</strong><br/>
             Salary: 8–30 LPA<br/>
             Difficulty: High<br/>
-            Future Demand: ⭐⭐⭐⭐⭐
+            Rating: ⭐⭐⭐⭐⭐
           </div>
           <div class="top-career-card">
             <strong>AI / ML Engineer</strong><br/>
             Salary: 10–40 LPA<br/>
             Difficulty: High<br/>
-            Future Demand: ⭐⭐⭐⭐⭐
+            Rating: ⭐⭐⭐⭐⭐
           </div>
           <div class="top-career-card">
             <strong>Cloud / DevOps Engineer</strong><br/>
             Salary: 8–35 LPA<br/>
             Difficulty: High<br/>
-            Future Demand: ⭐⭐⭐⭐☆
+            Rating: ⭐⭐⭐⭐☆
           </div>
           <div class="top-career-card">
             <strong>Cyber Security Engineer</strong><br/>
             Salary: 8–30 LPA<br/>
             Difficulty: High<br/>
-            Future Demand: ⭐⭐⭐⭐⭐
+            Rating: ⭐⭐⭐⭐⭐
           </div>
           <div class="top-career-card">
             <strong>Full Stack Developer</strong><br/>
             Salary: 6–25 LPA<br/>
             Difficulty: Medium<br/>
-            Future Demand: ⭐⭐⭐⭐☆
+            Rating: ⭐⭐⭐⭐☆
           </div>
           <div class="top-career-card">
             <strong>UI/UX Designer</strong><br/>
             Salary: 5–20 LPA<br/>
             Difficulty: Medium<br/>
-            Future Demand: ⭐⭐⭐⭐☆
+            Rating: ⭐⭐⭐⭐☆
           </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown("</div>", unsafe_allow_html=True)  # section
+    st.markdown("</div>", unsafe_allow_html=True)  # close section
 
-    st.markdown("</div>", unsafe_allow_html=True)  # app-root
+    st.markdown("</div>", unsafe_allow_html=True)  # close app-root
 
 # -----------------------------------------------------
-# CAREER CHART PAGE
+# CAREER CHART PAGE (AI GENERATED)
 # -----------------------------------------------------
 def page_career_chart():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📊 Career Chart")
-    st.write(
-        """
-This is a simple view of how careers typically progress over time.
-You can later replace this with real data or charts.
-        """
-    )
-    st.markdown(
-        """
-**Typical Tech Career Progression (example)**
+    st.markdown("### 📊 AI Career Chart")
 
-- Student / Fresher  
-- Intern / Trainee Engineer  
-- Software Engineer / Developer  
-- Senior Engineer / Senior Developer  
-- Tech Lead / Module Lead  
-- Architect / Principal Engineer  
-- Engineering Manager / Head of Engineering  
-        """
-    )
+    name = st.text_input("Your Name (optional)")
+    skills = st.text_area("Your key skills", placeholder="e.g. Python, SQL, problem solving, communication")
+    interests = st.text_area("Your interests", placeholder="e.g. building apps, finance, design, research")
+
+    if st.button("Generate Career Chart", use_container_width=True):
+        if not skills.strip() or not interests.strip():
+            st.error("⚠️ Please fill at least skills and interests.")
+        else:
+            with st.spinner("AI is creating your career chart overview..."):
+                overview = get_career_chart_overview(
+                    name.strip() or "User",
+                    skills.strip(),
+                    interests.strip(),
+                )
+            st.markdown("### 📄 Your AI Career Chart Overview")
+            st.write(overview)
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
@@ -610,17 +652,17 @@ def page_ai_career_guidance():
 def page_library():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### 📚 Library")
-    st.write("You can later replace these with your real curated resources.")
+    st.write("Later you can replace these with your real curated resources.")
     st.markdown(
         """
 - **Data Science** – Kaggle, fast.ai, Analytics Vidhya  
 - **Web Development** – MDN, FreeCodeCamp, Frontend Mentor  
 - **DevOps** – KodeKloud, Kubernetes docs, AWS free tier labs  
-- **System Design** – Grokking SD, Gaurav Sen, Hussein Nasser  
+- **System Design** – Grokking System Design, Gaurav Sen, Hussein Nasser  
 - **Interview Prep** – LeetCode, InterviewBit, Striver’s DSA Sheet  
         """
     )
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markmarkdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # HISTORY PAGE
@@ -644,7 +686,7 @@ def page_history():
             st.markdown("---")
             st.write(item["advice"])
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markmarkdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # SETTINGS PAGE
@@ -665,17 +707,20 @@ def page_settings():
 def page_about():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### ℹ️ About")
+
     st.markdown(
         """
 **AI Career Guidance** is a personal project created by **Niyaz** to help:
 
-- Students choosing their first career path  
-- Freshers confused between multiple tech roles  
-- Professionals planning a role switch into IT / AI / Cloud  
+- Students exploring tech & business careers  
+- Freshers choosing between roles like DevOps, Data, Backend, etc.  
+- Professionals planning a career switch into IT / AI / Cloud  
 
-It uses **LLMs via Groq**, with a simple **Python + Streamlit** interface.
+It uses **Large Language Models (LLMs)** via **Groq**, with a simple
+**Python + Streamlit** interface so anyone can access AI-powered career help.
         """
     )
+
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
@@ -693,17 +738,18 @@ def page_contact():
         if not name.strip() or not email.strip() or not message.strip():
             st.error("⚠️ Please fill all fields.")
         else:
-            st.success("✅ Message captured locally (connect to email or DB later).")
+            st.success("✅ Message captured locally (you can connect to email or DB later).")
 
-    st.markdown("#### Social Links (update in code with your real links)")
-    st.markdown("- 🔗 LinkedIn: *your-link-here*")
-    st.markdown("- 🐙 GitHub: *your-link-here*")
-    st.markdown("- 💬 WhatsApp: *your-number-here*")
+    st.markdown("#### My Contact Details")
+    st.markdown("- 📧 **Email**: [Niyaz.kofficials@gmail.com](mailto:Niyaz.kofficials@gmail.com)")
+    st.markdown("- 📱 **Phone**: [+91 7751931035](tel:+917751931035)")
+    st.markdown("- 🔗 **LinkedIn**: [linkedin.com/in/iamnk7](https://linkedin.com/in/iamnk7)")
+    st.markdown("- 🐙 **GitHub**: [github.com/Iamnk07](https://github.com/Iamnk07)")
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# FOOTER (DARK, 4 COLUMNS)
+# FOOTER (Quick Links + Contact + Social Icons)
 # -----------------------------------------------------
 def render_footer():
     st.markdown(
@@ -712,24 +758,29 @@ def render_footer():
           <div class="footer-inner">
             <div>
               <div class="footer-logo">AI Career Guidance</div>
-              <div class="footer-link">Smart career suggestions powered by AI.</div>
+              <div class="footer-link">
+                Smart, AI-powered suggestions to help you make better career decisions.
+              </div>
             </div>
             <div>
               <div class="footer-col-title">Quick Links</div>
-              <div class="footer-link">Home</div>
-              <div class="footer-link">AI Career Guidance</div>
-              <div class="footer-link">Library</div>
+              <div class="footer-link">🏠 Home</div>
+              <div class="footer-link">🧠 AI Career Guidance</div>
+              <div class="footer-link">📊 Career Chart</div>
+              <div class="footer-link">📚 Library</div>
             </div>
             <div>
               <div class="footer-col-title">Support</div>
-              <div class="footer-link">Help</div>
-              <div class="footer-link">FAQ</div>
-              <div class="footer-link">Privacy Policy</div>
+              <div class="footer-link">❓ Help</div>
+              <div class="footer-link">📄 FAQ</div>
+              <div class="footer-link">🔐 Privacy Policy</div>
             </div>
             <div>
-              <div class="footer-col-title">Contact</div>
-              <div class="footer-link">Email: youremail@example.com</div>
-              <div class="footer-link">WhatsApp: +91-XXXXXXXXXX</div>
+              <div class="footer-col-title">Contact & Social</div>
+              <div class="footer-link">📧 <a href="mailto:Niyaz.kofficials@gmail.com">Niyaz.kofficials@gmail.com</a></div>
+              <div class="footer-link">📱 <a href="tel:+917751931035">+91 7751931035</a></div>
+              <div class="footer-link">🔗 <a href="https://linkedin.com/in/iamnk7" target="_blank">linkedin.com/in/iamnk7</a></div>
+              <div class="footer-link">🐙 <a href="https://github.com/Iamnk07" target="_blank">github.com/Iamnk07</a></div>
             </div>
           </div>
         </div>
