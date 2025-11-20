@@ -36,15 +36,16 @@ if "notes" not in st.session_state:
     st.session_state["notes"] = ""
 
 # -----------------------------------------------------
-# GLOBAL CSS (RESPONSIVE, CORPORATE STYLE)
+# GLOBAL CSS (RESPONSIVE, CLEAN CORPORATE)
 # -----------------------------------------------------
 CSS = """
 <style>
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f9fafb;
 }
 
-/* Main content wrapper */
+/* Root layout */
 .app-root {
     max-width: 1180px;
     margin: 0 auto;
@@ -57,8 +58,8 @@ body {
     top: 0;
     z-index: 50;
     backdrop-filter: blur(12px);
-    background: rgba(15,23,42,0.94);
-    border-bottom: 1px solid rgba(148,163,184,0.35);
+    background: rgba(15,23,42,0.96);
+    border-bottom: 1px solid rgba(148,163,184,0.4);
     padding: 0.5rem 1rem;
 }
 .nav-inner {
@@ -66,7 +67,7 @@ body {
     margin: 0 auto;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
 }
 .nav-left {
     display: flex;
@@ -99,49 +100,51 @@ body {
     color:#9ca3af;
 }
 
-/* menu */
-.nav-menu {
-    display:flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-}
-.nav-item {
-    font-size:0.82rem;
-    padding: 0.25rem 0.7rem;
-    border-radius:999px;
-    border: 1px solid transparent;
-    color:#e5e7eb;
-    cursor:pointer;
-    white-space:nowrap;
-}
-.nav-item-active {
-    border-color: #2563eb;
-    background: rgba(37,99,235,0.15);
-}
+/* Menu radio will render next to brand using Streamlit columns */
 
-/* right side auth */
+/* Right auth */
 .nav-right {
     display:flex;
     align-items:center;
-    gap:0.5rem;
+    gap:0.4rem;
     font-size:0.8rem;
     color:#e5e7eb;
+    justify-content:flex-end;
 }
 .nav-auth-link {
     cursor:pointer;
-    opacity:0.85;
+    opacity:0.9;
 }
 .nav-auth-sep {
-    opacity:0.5;
+    opacity:0.6;
 }
 
-/* HERO SECTION */
+/* Make radio horizontally scrollable on small screens */
+div[data-testid="stHorizontalBlock"] > div {
+    overflow-x: auto;
+}
+
+/* Header title in content */
+.app-header-title {
+    text-align:center;
+    font-size:1.7rem;
+    font-weight:600;
+    margin-bottom:0.25rem;
+}
+.app-header-subtitle {
+    text-align:center;
+    font-size:0.9rem;
+    color:#6b7280;
+    margin-bottom:1.2rem;
+}
+
+/* Hero */
 .hero {
     display:flex;
     flex-wrap:wrap;
     gap:2rem;
     align-items:center;
-    margin: 2rem 0 2.5rem 0;
+    margin: 1.5rem 0 2.5rem 0;
 }
 .hero-left {
     flex:1 1 260px;
@@ -162,24 +165,6 @@ body {
     flex-wrap:wrap;
     gap:0.7rem;
 }
-.hero-btn-primary {
-    padding:0.55rem 1.2rem;
-    border-radius:999px;
-    border:none;
-    background:#2563eb;
-    color:white;
-    font-size:0.9rem;
-    cursor:pointer;
-}
-.hero-btn-secondary {
-    padding:0.55rem 1.2rem;
-    border-radius:999px;
-    border: 1px solid #d1d5db;
-    background:white;
-    color:#111827;
-    font-size:0.9rem;
-    cursor:pointer;
-}
 .hero-right {
     flex:1 1 260px;
     min-height:220px;
@@ -193,9 +178,9 @@ body {
     aspect-ratio:1/1;
     border-radius:24px;
     background:
-      radial-gradient(circle at 0% 0%, #2563eb 0, transparent 55%),
-      radial-gradient(circle at 100% 100%, #22c55e 0, transparent 55%),
-      radial-gradient(circle at 50% 0%, #f97316 0, transparent 55%),
+      radial-gradient(circle at 0% 0%, #2563eb 0, transparent 60%),
+      radial-gradient(circle at 100% 100%, #22c55e 0, transparent 60%),
+      radial-gradient(circle at 50% 0%, #f97316 0, transparent 60%),
       #0b1120;
     position:relative;
     overflow:hidden;
@@ -247,7 +232,7 @@ body {
     margin-bottom:0.9rem;
 }
 
-/* 3-step "How it works" */
+/* How it works */
 .how-grid {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -261,7 +246,7 @@ body {
     font-size:0.85rem;
 }
 
-/* Features grid */
+/* Features */
 .features-grid {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -276,7 +261,7 @@ body {
     min-height:90px;
 }
 
-/* Career categories with hover */
+/* Categories */
 .categories-grid {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -288,9 +273,6 @@ body {
     padding:0.9rem;
     background:#ffffff;
     font-size:0.85rem;
-    position:relative;
-    overflow:hidden;
-    cursor:default;
 }
 .category-roles {
     margin-top:0.4rem;
@@ -298,7 +280,7 @@ body {
     color:#6b7280;
 }
 
-/* AI Chat preview */
+/* AI chat preview */
 .chat-preview {
     border-radius:0.75rem;
     border:1px solid #e5e7eb;
@@ -322,18 +304,38 @@ body {
     font-size:0.85rem;
 }
 
+/* About section */
+.about-grid {
+    display:grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    gap:1rem;
+}
+.about-image {
+    border-radius:0.75rem;
+    background:radial-gradient(circle at 0% 0%, #2563eb 0, transparent 60%),
+               radial-gradient(circle at 100% 100%, #22c55e 0, transparent 60%),
+               #0b1120;
+    min-height:180px;
+}
+
+/* Contact */
+.contact-card {
+    border-radius:0.75rem;
+    border:1px solid #e5e7eb;
+    padding:1rem;
+    background:#ffffff;
+}
+
 /* Footer */
 .footer {
     margin-top:3rem;
-    padding-top:1.5rem;
-    border-top:1px solid #e5e7eb;
     background:#020617;
     color:#e5e7eb;
 }
 .footer-inner {
     max-width:1180px;
     margin:0 auto;
-    padding:1.5rem 1rem;
+    padding:1.5rem 1rem 2rem 1rem;
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap:1rem;
@@ -358,62 +360,61 @@ body {
     text-decoration:underline;
 }
 
+/* Splash */
+.splash-layer {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(37,99,235,0.9), transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(14,165,233,0.9), transparent 50%),
+        #020617;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+}
+.splash-content {
+    text-align:center;
+    color:#e5e7eb;
+    padding: 1.8rem 2.2rem;
+    border-radius:18px;
+    background:rgba(15,23,42,0.94);
+    border:1px solid rgba(148,163,184,0.5);
+    min-width:260px;
+}
+.splash-title {
+    font-size:clamp(1.6rem, 3vw, 2.1rem);
+    font-weight:650;
+    margin-bottom:0.4rem;
+}
+.splash-sub {
+    font-size:0.9rem;
+    color:#9ca3af;
+    margin-bottom:0.4rem;
+}
+.splash-author {
+    font-size:0.8rem;
+    color:#cbd5f5;
+    opacity:0.9;
+}
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# SPLASH SCREEN (FULLSCREEN, 4s, ANIMATED BG)
+# SPLASH SCREEN (FULLSCREEN, 4s)
 # -----------------------------------------------------
 def show_splash():
-    splash_html = """
-    <style>
-    .splash-layer {
-        position: fixed;
-        inset: 0;
-        background:
-            radial-gradient(circle at 10% 20%, rgba(37,99,235,0.9), transparent 50%),
-            radial-gradient(circle at 90% 80%, rgba(14,165,233,0.9), transparent 50%),
-            #020617;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        z-index:9999;
-    }
-    .splash-content {
-        text-align:center;
-        color:#e5e7eb;
-        padding: 1.8rem 2.2rem;
-        border-radius:18px;
-        background:rgba(15,23,42,0.92);
-        border:1px solid rgba(148,163,184,0.5);
-        min-width:260px;
-    }
-    .splash-title {
-        font-size:clamp(1.6rem, 3vw, 2.1rem);
-        font-weight:650;
-        margin-bottom:0.4rem;
-    }
-    .splash-sub {
-        font-size:0.9rem;
-        color:#9ca3af;
-        margin-bottom:0.4rem;
-    }
-    .splash-author {
-        font-size:0.8rem;
-        color:#cbd5f5;
-        opacity:0.9;
-    }
-    </style>
+    html = """
     <div class="splash-layer">
       <div class="splash-content">
         <div class="splash-title">Welcome to AI Career Guidance</div>
-        <div class="splash-sub">Smart career insights, powered by AI.</div>
+        <div class="splash-sub">Smart career insights powered by AI.</div>
         <div class="splash-author">Created by Niyaz</div>
       </div>
     </div>
     """
-    st.markdown(splash_html, unsafe_allow_html=True)
+    st.markdown(html, unsafe_allow_html=True)
 
 if not st.session_state["splash_done"]:
     show_splash()
@@ -433,11 +434,11 @@ client = get_client()
 
 def call_groq(prompt: str) -> str:
     try:
-        response = client.chat.completions.create(
-            model="openai/gpt-oss-20b",
+        resp = client.chat.completions.create(
+            model="openai/gpt-oss-20b",  # ✅ model your account has
             messages=[{"role": "user", "content": prompt}],
         )
-        return response.choices[0].message.content
+        return resp.choices[0].message.content
     except Exception as e:
         return f"❌ API Error: {e}"
 
@@ -467,17 +468,17 @@ Format the output clearly using headings and bullet points.
     return call_groq(prompt)
 
 
-def career_chat_reply(message: str) -> str:
+def get_chat_reply(message: str) -> str:
     prompt = f"""
 You are an AI career assistant for Indian students and early professionals.
-Be specific, clear, and practical.
+Be clear, specific, and practical.
 
 User question: {message}
 """
     return call_groq(prompt)
 
 # -----------------------------------------------------
-# NAVBAR (LOGO LEFT, MENU CENTER, LOGIN/SIGNUP RIGHT)
+# NAVBAR (LOGO LEFT, MENU, LOGIN/SIGNUP RIGHT)
 # -----------------------------------------------------
 menu_items = [
     "Home",
@@ -491,27 +492,28 @@ menu_items = [
 ]
 
 def render_navbar():
-    st.markdown(
-        """
-        <div class="navbar">
-          <div class="nav-inner">
+    st.markdown('<div class="navbar"><div class="nav-inner">', unsafe_allow_html=True)
+
+    # Left logo & brand
+    col_left, col_menu, col_right = st.columns([2, 6, 2])
+    with col_left:
+        st.markdown(
+            """
             <div class="nav-left">
               <div class="nav-logo">AI</div>
               <div class="nav-brand-text">
-                <div class="nav-brand-title">Career Guidance</div>
-                <div class="nav-brand-subtitle">Powered by AI</div>
+                <div class="nav-brand-title">AI Career Guidance</div>
+                <div class="nav-brand-subtitle">Plan your next step with AI</div>
               </div>
             </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
 
-    # menu and login/signup in Python (because we need interactivity)
-    cols = st.columns([5, 3, 2], gap="small")
-    with cols[0]:
-        # horizontal radio as menu
+    # Center menu as radio
+    with col_menu:
         active = st.radio(
-            "Menu",
+            "Navigation",
             menu_items,
             horizontal=True,
             label_visibility="collapsed",
@@ -520,24 +522,40 @@ def render_navbar():
         )
         st.session_state["active_page"] = active
 
-    with cols[2]:
+    # Right auth text
+    with col_right:
         st.markdown(
-            '<div class="nav-right"><span class="nav-auth-link">Login</span><span class="nav-auth-sep">|</span><span class="nav-auth-link">Sign up</span></div>',
+            """
+            <div class="nav-right">
+              <span class="nav-auth-link">Login</span>
+              <span class="nav-auth-sep">|</span>
+              <span class="nav-auth-link">Sign up</span>
+            </div>
+            """,
             unsafe_allow_html=True,
         )
 
-    st.markdown("</div></div>", unsafe_allow_html=True)  # close nav-inner & navbar
-
+    st.markdown("</div></div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# HOME PAGE (ALL SECTIONS FROM BLUEPRINT)
+# PAGES
 # -----------------------------------------------------
 def page_home():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
 
+    # Header
+    st.markdown(
+        """
+        <div class="app-header-title">Find Your Best Career Path With AI</div>
+        <div class="app-header-subtitle">
+            Smart suggestions based on your skills & interests.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
     # HERO
     st.markdown('<div class="hero">', unsafe_allow_html=True)
-
     col_left, col_right = st.columns([1.2, 1], gap="large")
 
     with col_left:
@@ -546,19 +564,19 @@ def page_home():
             <div class="hero-left">
                 <div class="hero-title">Find Your Best Career Path With AI</div>
                 <div class="hero-subtitle">
-                    Smart suggestions based on your skills & interests. Get clarity on roles, skills, and the roadmap ahead.
+                    Get a clear, personalized roadmap based on your skills, interests,
+                    and long-term goals. No more random career advice.
                 </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
-        # Buttons uses normal st.button but styled externally
-        b1, b2 = st.columns(2)
-        with b1:
+        c1, c2 = st.columns(2)
+        with c1:
             if st.button("Start Career Test", use_container_width=True):
                 st.session_state["active_page"] = "AI Career Guidance"
                 st.rerun()
-        with b2:
+        with c2:
             if st.button("Explore Careers", use_container_width=True):
                 st.session_state["active_page"] = "AI Career Guidance"
                 st.rerun()
@@ -595,16 +613,16 @@ def page_home():
         """
         <div class="how-grid">
           <div class="how-card">
-            <strong>Step 1</strong><br/>
-            Take a 5-minute AI-powered test about your skills & interests.
+            <strong>Step 1 – Take a 5-minute AI test</strong><br/>
+            Answer a few questions about your skills, interests, and experience.
           </div>
           <div class="how-card">
-            <strong>Step 2</strong><br/>
-            AI analyzes your profile and compares it with modern career paths.
+            <strong>Step 2 – AI analyzes your profile</strong><br/>
+            Your inputs are compared with modern roles and skill requirements.
           </div>
           <div class="how-card">
-            <strong>Step 3</strong><br/>
-            Get a clear roadmap with skills, resources, and growth options.
+            <strong>Step 3 – Get your career roadmap</strong><br/>
+            Receive a clear plan: roles, skills to learn, resources, and salary insights.
           </div>
         </div>
         """,
@@ -617,21 +635,21 @@ def page_home():
     st.markdown(
         """
         <div class="section-title">What you can do inside</div>
-        <div class="section-subtitle">Powerful tools to explore and track your career journey.</div>
+        <div class="section-subtitle">All-in-one space for exploring and planning your career.</div>
         """,
         unsafe_allow_html=True,
     )
     st.markdown(
         """
         <div class="features-grid">
-          <div class="feature-card"><strong>AI Career Test</strong><br/>Understand where you fit best, based on your profile.</div>
-          <div class="feature-card"><strong>Skill Strength Checker</strong><br/>See which skills are strong and where to improve.</div>
-          <div class="feature-card"><strong>Career Suggestions</strong><br/>Get role suggestions aligned with your interests.</div>
-          <div class="feature-card"><strong>Career Roadmaps</strong><br/>See step-by-step paths to reach your goal role.</div>
-          <div class="feature-card"><strong>Salary Prediction</strong><br/>View typical salary ranges in India by role.</div>
-          <div class="feature-card"><strong>Career Library</strong><br/>Curated resources, videos, and reading lists.</div>
-          <div class="feature-card"><strong>Notes</strong><br/>Save your own thoughts and guidance in one place.</div>
-          <div class="feature-card"><strong>Settings/Profile</strong><br/>Customize your experience for future use.</div>
+          <div class="feature-card"><strong>AI Career Test</strong><br/>Find matching roles based on your profile.</div>
+          <div class="feature-card"><strong>Skill Strength Checker</strong><br/>See which skills are strong and which need work.</div>
+          <div class="feature-card"><strong>Career Suggestions</strong><br/>Get a list of roles aligned with your interests.</div>
+          <div class="feature-card"><strong>Career Roadmaps</strong><br/>See step-by-step plans to reach your goal role.</div>
+          <div class="feature-card"><strong>Salary Prediction</strong><br/>View typical salary ranges in India for each role.</div>
+          <div class="feature-card"><strong>Career Library</strong><br/>Access curated links, videos, and articles.</div>
+          <div class="feature-card"><strong>Notes</strong><br/>Save your thoughts and guidance in one place.</div>
+          <div class="feature-card"><strong>Settings/Profile</strong><br/>Customize your experience for future visits.</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -695,7 +713,7 @@ def page_home():
             <div class="category-roles">
               • SEO Specialist<br/>
               • Performance Marketer<br/>
-              • Social Media Strategist
+              • Social Media Manager
             </div>
           </div>
         </div>
@@ -709,7 +727,7 @@ def page_home():
     st.markdown(
         """
         <div class="section-title">AI career chat</div>
-        <div class="section-subtitle">Ask questions like “Is DevOps good for me?” or “How to switch from mechanical to IT?”</div>
+        <div class="section-subtitle">Ask questions like “Is DevOps good for me?” or “How to switch from mechanical to IT?”.</div>
         """,
         unsafe_allow_html=True,
     )
@@ -719,7 +737,7 @@ def page_home():
             """
             <div class="chat-preview">
               <strong>Ask me anything about your career!</strong><br/>
-              <span style="font-size:0.8rem; color:#6b7280;">Example: "I am a B.Tech CSE student. Which role suits me better: Data Engineer or Backend Developer?"</span>
+              <span style="font-size:0.8rem; color:#6b7280;">Example: "I am a B.Tech CSE student. Which is better for me: Data Engineer or Backend Developer?"</span>
             </div>
             """,
             unsafe_allow_html=True,
@@ -729,11 +747,11 @@ def page_home():
             st.rerun()
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # POPULAR CAREERS SECTION
+    # POPULAR CAREERS
     st.markdown('<div class="section">', unsafe_allow_html=True)
     st.markdown(
         """
-        <div class="section-title">Popular careers right now</div>
+        <div class="section-title">Popular careers</div>
         <div class="section-subtitle">High-demand roles with strong future growth.</div>
         """,
         unsafe_allow_html=True,
@@ -760,14 +778,14 @@ def page_home():
             Future Demand: ⭐⭐⭐⭐☆
           </div>
           <div class="pop-card">
-            <strong>Financial Analyst</strong><br/>
-            Salary Range: 6–20 LPA<br/>
+            <strong>UI/UX Designer</strong><br/>
+            Salary Range: 5–20 LPA<br/>
             Difficulty: Medium<br/>
             Future Demand: ⭐⭐⭐⭐☆
           </div>
           <div class="pop-card">
-            <strong>UI/UX Designer</strong><br/>
-            Salary Range: 5–20 LPA<br/>
+            <strong>Financial Analyst</strong><br/>
+            Salary Range: 6–20 LPA<br/>
             Difficulty: Medium<br/>
             Future Demand: ⭐⭐⭐⭐☆
           </div>
@@ -783,12 +801,64 @@ def page_home():
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)  # close .app-root
+    # ABOUT SECTION
+    st.markdown('<div class="section">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="section-title">About CareerAI</div>
+        <div class="section-subtitle">Why this project exists and how it helps you.</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="about-grid">', unsafe_allow_html=True)
+    col_img, col_text = st.columns([1, 1.4])
+    with col_img:
+        st.markdown('<div class="about-image"></div>', unsafe_allow_html=True)
+    with col_text:
+        st.write(
+            """
+CareerAI is a personal project created by **Niyaz** to support students and early professionals
+in making better, data-driven career decisions.
 
+Instead of random suggestions, you get AI-based guidance that considers:
+- Your interests and skills  
+- Real-world roles and skill requirements  
+- Practical roadmaps and resources  
 
-# -----------------------------------------------------
-# AI CAREER GUIDANCE PAGE (FORM + RESULT)
-# -----------------------------------------------------
+**Technologies used**  
+- Large Language Models (LLMs) via Groq  
+- Python & Streamlit for the interface  
+            """
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # CONTACT SECTION
+    st.markdown('<div class="section">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="section-title">Contact</div>
+        <div class="section-subtitle">Share feedback, suggestions, or collaboration ideas.</div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="contact-card">', unsafe_allow_html=True)
+    name = st.text_input("Your Name (Home Contact)")
+    email = st.text_input("Your Email (Home Contact)")
+    message = st.text_area("Your Message", height=120)
+    if st.button("Send Message", use_container_width=True):
+        if not name.strip() or not email.strip() or not message.strip():
+            st.error("⚠️ Please fill all fields.")
+        else:
+            st.success("✅ Message captured locally (connect to email or DB later).")
+
+    st.write("**Social Links** (update with your real links):")
+    st.markdown("- 🔗 LinkedIn: *your-link-here*")
+    st.markdown("- 🐙 GitHub: *your-link-here*")
+    st.markdown("- 💬 WhatsApp: *your-number-here*")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)  # close app-root
+
 def page_ai_career_guidance():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### 🧠 AI Career Guidance")
@@ -797,13 +867,13 @@ def page_ai_career_guidance():
     interests = st.text_input("Your Interests (e.g. Coding, Finance, Design)")
     skills = st.text_input("Your Skills (e.g. Python, Excel, Communication)")
     education = st.text_input("Your Education (e.g. B.Tech CSE, B.Com)")
-    goals = st.text_input("Your Career Goals (e.g. AI Engineer, DevOps Engineer)")
+    goals = st.text_input("Your Career Goals (e.g. DevOps Engineer, Data Scientist)")
 
     if st.button("Generate Career Guidance", use_container_width=True):
         if not all([name.strip(), interests.strip(), skills.strip(), education.strip(), goals.strip()]):
             st.error("⚠️ Please fill all fields.")
         else:
-            with st.spinner("Analyzing your profile..."):
+            with st.spinner("Analyzing your profile and generating guidance..."):
                 advice = get_career_advice(
                     interests.strip(),
                     skills.strip(),
@@ -828,15 +898,10 @@ def page_ai_career_guidance():
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# CAREER CHAT PAGE
-# -----------------------------------------------------
 def page_career_chat():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### 💬 AI Career Chat")
-
-    st.write("Ask any question about your career, roles, skills, or transitions.")
+    st.write("Ask anything about careers, skills, transitions, or learning paths.")
 
     for msg in st.session_state["chat_messages"]:
         with st.chat_message(msg["role"]):
@@ -849,51 +914,35 @@ def page_career_chat():
             st.markdown(user_input)
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
-                reply = career_chat_reply(user_input)
+                reply = get_chat_reply(user_input)
                 st.markdown(reply)
         st.session_state["chat_messages"].append({"role": "assistant", "content": reply})
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# LIBRARY PAGE (STATIC RESOURCES)
-# -----------------------------------------------------
 def page_library():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### 📚 Career Library")
-
-    st.write("Some example resources you can later replace with your real links:")
-
+    st.write("You can later replace these with your real curated resources.")
     st.markdown(
         """
 - **Data Science** – Kaggle, fast.ai, Analytics Vidhya  
 - **Web Development** – MDN Web Docs, FreeCodeCamp, Frontend Mentor  
 - **DevOps** – KodeKloud, Kubernetes docs, AWS free tier labs  
-- **System Design** – Grokking System Design, YouTube (Gaurav Sen, Hussein Nasser)  
+- **System Design** – Grokking System Design, Gaurav Sen, Hussein Nasser  
 - **Interview Prep** – LeetCode, InterviewBit, Striver’s DSA Sheet  
         """
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# NOTES PAGE (SESSION-BASED NOTES)
-# -----------------------------------------------------
 def page_notes():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### 📝 Notes")
-
-    st.write("Keep quick notes about your plans, ideas, or feedback from mentors.")
-    text = st.text_area("Your notes", value=st.session_state["notes"], height=200)
+    st.write("Keep your own notes about plans, ideas, or feedback from mentors.")
+    text = st.text_area("Your notes", value=st.session_state["notes"], height=220)
     st.session_state["notes"] = text
-
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# SETTINGS PAGE
-# -----------------------------------------------------
 def page_settings():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### ⚙️ Settings")
@@ -913,92 +962,45 @@ def page_settings():
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# ABOUT PAGE  (FROM BLUEPRINT)
-# -----------------------------------------------------
 def page_about():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
     st.markdown("### ℹ️ About CareerAI")
-
     st.markdown(
         """
-**CareerAI** is a personal project created by Niyaz to help students and early professionals:
+**CareerAI** is a personal project created by **Niyaz** to help students and early professionals:
 
-- Understand which roles fit their interests and skills  
-- Get an AI-generated roadmap instead of random advice  
-- Learn what skills, tools, and technologies are actually in demand  
+- Discover roles that match their interests and strengths  
+- Understand real-world skill expectations  
+- Get a practical roadmap instead of random advice  
 
-**Mission**
+**Tech stack:**
 
-To make career guidance more accessible, practical, and data-driven for everyone.
-
-**Technologies Used**
-
-- Large Language Models (LLMs) via Groq  
-- Python & Streamlit for the interface  
-- Modern UI/UX ideas inspired by real career platforms  
+- Python & Streamlit for the web interface  
+- Groq API (`openai/gpt-oss-20b`) for AI  
+- Deployed on Streamlit Community Cloud  
         """
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# CONTACT PAGE (FORM + SOCIAL LINKS)
-# -----------------------------------------------------
 def page_contact():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📬 Contact")
-
+    st.markmarkdown("### 📬 Contact")
     name = st.text_input("Your Name")
     email = st.text_input("Your Email")
-    message = st.text_area("Your Message", height=150)
+    msg = st.text_area("Your Message", height=150)
 
     if st.button("Send", use_container_width=True):
-        if not name.strip() or not email.strip() or not message.strip():
+        if not name.strip() or not email.strip() or not msg.strip():
             st.error("⚠️ Please fill all fields.")
         else:
-            st.success("✅ Message captured locally (you can later connect this to email or a database).")
+            st.success("✅ Message captured locally (later connect to backend or email).")
 
     st.markdown("#### Social Links")
-    st.markdown(
-        """
-- 🔗 LinkedIn: *your-link-here*  
-- 🐙 GitHub: *your-link-here*  
-- 💬 WhatsApp: *your-number-here*  
-        """
-    )
-
+    st.markdown("- 🔗 LinkedIn: *your-link-here*")
+    st.markdown("- 🐙 GitHub: *your-link-here*")
+    st.markdown("- 💬 WhatsApp: *your-number-here*")
     st.markdown("</div>", unsafe_allow_html=True)
 
-
-# -----------------------------------------------------
-# HISTORY PAGE (FROM BLUEPRINT)
-# -----------------------------------------------------
-def page_history():
-    st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📚 Career Guidance History")
-
-    if not st.session_state["history"]:
-        st.info("No history yet. Use AI Career Guidance to generate your first report.")
-        st.markdown("</div>", unsafe_allow_html=True)
-        return
-
-    for i, item in enumerate(reversed(st.session_state["history"]), start=1):
-        with st.expander(f"{i}. {item['time']} — {item['name']} ({item['goals']})"):
-            st.write(f"**Interests:** {item['interests']}")
-            st.write(f"**Skills:** {item['skills']}")
-            st.write(f"**Education:** {item['education']}")
-            st.write(f"**Goals:** {item['goals']}")
-            st.markdown("---")
-            st.write(item["advice"])
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-# -----------------------------------------------------
-# FOOTER (4 COLUMNS, DARK BACKGROUND)
-# -----------------------------------------------------
 def render_footer():
     st.markdown(
         """
@@ -1032,7 +1034,7 @@ def render_footer():
     )
 
 # -----------------------------------------------------
-# MAIN LAYOUT
+# MAIN
 # -----------------------------------------------------
 render_navbar()
 
@@ -1054,7 +1056,5 @@ elif page == "About":
     page_about()
 elif page == "Contact":
     page_contact()
-elif page == "History":
-    page_history()  # (not in nav list, but kept for safety)
 
 render_footer()
