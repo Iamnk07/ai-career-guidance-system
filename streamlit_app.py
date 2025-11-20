@@ -25,75 +25,92 @@ if "history" not in st.session_state:
     st.session_state["history"] = []
 
 # -----------------------------------------------------
-# GLOBAL CSS (BANANI-LIKE)
+# GLOBAL CSS – NEW PROFESSIONAL DESIGN
 # -----------------------------------------------------
 CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Fredoka:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* App background: gradient + blurred circles */
+/* App background: clean gradient */
 .stApp {
-    background: radial-gradient(circle at 10% 20%, #1d4ed8 0, transparent 55%),
-                radial-gradient(circle at 80% 80%, #22c55e 0, transparent 55%),
-                radial-gradient(circle at 0% 80%, #f97316 0, transparent 55%),
+    background: radial-gradient(circle at top left, #1d4ed8 0, transparent 55%),
+                radial-gradient(circle at bottom right, #14b8a6 0, transparent 60%),
                 #020617;
 }
 [data-testid="stAppViewContainer"] {
     background: transparent;
 }
 
-/* subtle grid overlay */
+/* Subtle grid overlay */
 [data-testid="stAppViewContainer"]::before {
     content: "";
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(15,23,42,0.35) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15,23,42,0.35) 1px, transparent 1px);
-    background-size: 60px 60px;
-    opacity: 0.32;
+        linear-gradient(rgba(15,23,42,0.25) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.25) 1px, transparent 1px);
+    background-size: 80px 80px;
+    opacity: 0.25;
     pointer-events: none;
     z-index: -1;
 }
 
 /* Container padding */
 .block-container {
-    padding-top: 1.0rem;
+    padding-top: 1.2rem;
     padding-bottom: 3rem;
 }
 
-/* Sidebar (dark) */
+/* Sidebar */
 section[data-testid="stSidebar"] {
-    background: #020617;
-    border-right: 1px solid #111827;
+    background: rgba(15,23,42,0.96);
+    border-right: 1px solid rgba(31,41,55,0.9);
+    backdrop-filter: blur(22px);
 }
 section[data-testid="stSidebar"] * {
     color: #e5e7eb !important;
 }
 .sidebar-header-title {
-    font-size: 1.0rem;
+    font-size: 1.05rem;
     font-weight: 600;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.15rem;
 }
 .sidebar-header-sub {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: #9ca3af;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.5rem;
 }
 .sidebar-separator {
     border-bottom: 1px solid #1f2937;
-    margin: 0.4rem 0 0.6rem 0;
+    margin: 0.4rem 0 0.8rem 0;
+}
+label[data-testid="stMetricLabel"] {
+    color: #9ca3af !important;
+}
+
+/* Radio in sidebar */
+[role="radiogroup"] > label {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+}
+[role="radiogroup"] > label:hover {
+    background: rgba(31,41,55,0.95);
+}
+[role="radiogroup"] input:checked + div {
+    font-weight: 600;
 }
 
 /* Root wrapper */
 .app-root {
-    max-width: 1180px;
+    max-width: 1120px;
     margin: 0 auto;
-    padding: 0.5rem 1rem 4rem 1rem;
+    padding: 0.5rem 0.8rem 4rem 0.8rem;
 }
 
 /* ---------------- SPLASH ----------------- */
@@ -102,8 +119,8 @@ section[data-testid="stSidebar"] * {
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at 10% 20%, rgba(37,99,235,0.9), transparent 55%),
-        radial-gradient(circle at 90% 80%, rgba(34,197,94,0.85), transparent 55%),
+        radial-gradient(circle at 0% 0%, rgba(59,130,246,0.9), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(45,212,191,0.8), transparent 60%),
         #020617;
     display:flex;
     align-items:center;
@@ -114,30 +131,22 @@ section[data-testid="stSidebar"] * {
     position: relative;
     text-align:left;
     color:#e5e7eb;
-    padding: 2.3rem 2.7rem;
-    border-radius:24px;
-    background:#050821;
-    border:1px solid rgba(148,163,184,0.7);
+    padding: 2.4rem 2.7rem;
+    border-radius:28px;
+    background:rgba(15,23,42,0.96);
+    border:1px solid rgba(148,163,184,0.55);
     min-width:320px;
     max-width:720px;
-    box-shadow:0 24px 60px rgba(0,0,0,0.9);
+    box-shadow:0 26px 70px rgba(0,0,0,0.9);
     overflow:hidden;
 }
-.splash-gradient-orb-left {
+.splash-accent-orb {
     position:absolute;
-    width:340px; height:340px;
+    width:360px; height:360px;
     border-radius:999px;
-    background:radial-gradient(circle, rgba(56,189,248,0.8), transparent 65%);
-    left:-160px; top:-160px;
-    opacity:0.5;
-}
-.splash-gradient-orb-right {
-    position:absolute;
-    width:340px; height:340px;
-    border-radius:999px;
-    background:radial-gradient(circle, rgba(249,115,22,0.8), transparent 65%);
-    right:-200px; bottom:-200px;
-    opacity:0.5;
+    background:radial-gradient(circle, rgba(56,189,248,0.7), transparent 65%);
+    right:-160px; top:-160px;
+    opacity:0.4;
 }
 .splash-card-inner {
     position:relative;
@@ -145,11 +154,11 @@ section[data-testid="stSidebar"] * {
 .splash-pill {
     display:inline-flex;
     align-items:center;
-    gap:0.4rem;
-    padding:0.25rem 0.9rem;
+    gap:0.45rem;
+    padding:0.2rem 0.9rem;
     border-radius:999px;
-    background:#020617;
-    border:1px solid rgba(148,163,184,0.7);
+    background:rgba(15,23,42,0.98);
+    border:1px solid rgba(148,163,184,0.55);
     font-size:0.75rem;
     margin-bottom:0.9rem;
 }
@@ -159,36 +168,37 @@ section[data-testid="stSidebar"] * {
     background:#22c55e;
 }
 .splash-welcome {
-    font-family:"Baloo 2", system-ui;
-    font-size:2.7rem;
-    font-weight:800;
-    letter-spacing:0.18em;
-    margin-bottom:0.5rem;
+    font-family:"Plus Jakarta Sans", system-ui;
+    font-size:2.4rem;
+    font-weight:700;
+    letter-spacing:0.16em;
+    margin-bottom:0.4rem;
 }
 .splash-title-main {
-    font-family:"Fredoka", system-ui;
+    font-family:"Plus Jakarta Sans", system-ui;
     font-size:1.4rem;
     font-weight:700;
-    margin-bottom:0.3rem;
+    margin-bottom:0.35rem;
 }
 .splash-subline {
-    font-size:0.95rem;
+    font-size:0.94rem;
     color:#e5e7eb;
-    margin-bottom:0.7rem;
+    margin-bottom:0.6rem;
 }
 .splash-desc {
-    font-size:0.8rem;
+    font-size:0.82rem;
     color:#9ca3af;
-    margin-bottom:1.1rem;
+    margin-bottom:1.15rem;
+    max-width:480px;
 }
 .splash-buttons {
     display:flex;
     gap:0.7rem;
     flex-wrap:wrap;
-    margin-bottom:0.9rem;
+    margin-bottom:1.0rem;
 }
 .splash-btn-primary {
-    padding:0.5rem 1.5rem;
+    padding:0.55rem 1.5rem;
     border-radius:999px;
     border:none;
     background:linear-gradient(135deg,#4f46e5,#22c55e);
@@ -197,13 +207,12 @@ section[data-testid="stSidebar"] * {
     font-weight:600;
 }
 .splash-btn-secondary {
-    padding:0.45rem 1.0rem;
+    padding:0.5rem 1.1rem;
     border-radius:999px;
-    border:none;
+    border:1px solid rgba(148,163,184,0.6);
     background:transparent;
     color:#e5e7eb;
     font-size:0.8rem;
-    text-decoration:underline;
 }
 .splash-footer-row {
     display:flex;
@@ -211,82 +220,87 @@ section[data-testid="stSidebar"] * {
     justify-content:space-between;
     flex-wrap:wrap;
     gap:0.5rem;
-    font-size:0.75rem;
+    font-size:0.78rem;
     color:#9ca3af;
 }
 .splash-ready-pill {
     padding:0.25rem 0.9rem;
     border-radius:999px;
-    background:#020617;
-    border:1px solid rgba(34,197,94,0.7);
+    background:rgba(15,23,42,0.98);
+    border:1px solid rgba(34,197,94,0.8);
     font-size:0.75rem;
 }
 
 /* -------------- MAIN CARDS (HOME + PAGES) ---------------- */
 
-.home-main-card,
-.page-card {
-    background:#050821;
-    border-radius:24px;
-    border:1px solid rgba(148,163,184,0.45);
-    padding:1.7rem 1.9rem;
+.surface-card {
+    background:rgba(15,23,42,0.98);
+    border-radius:22px;
+    border:1px solid rgba(148,163,184,0.40);
+    padding:1.6rem 1.8rem;
     color:#e5e7eb;
-    box-shadow:0 22px 55px rgba(0,0,0,0.9);
+    box-shadow:0 18px 50px rgba(0,0,0,0.75);
 }
 
-.home-pill {
+/* home header */
+.home-badge {
     display:inline-flex;
     align-items:center;
-    gap:0.4rem;
-    padding:0.18rem 0.9rem;
+    gap:0.45rem;
+    padding:0.22rem 0.9rem;
     border-radius:999px;
-    background:#020617;
-    border:1px solid rgba(148,163,184,0.6);
-    font-size:0.75rem;
-    margin-bottom:0.7rem;
+    background:rgba(15,23,42,0.98);
+    border:1px solid rgba(148,163,184,0.55);
+    font-size:0.77rem;
+    margin-bottom:0.75rem;
 }
-.home-pill-dot {
+.home-badge-dot {
     width:9px; height:9px;
     border-radius:999px;
     background:#22c55e;
 }
-.home-title-main {
-    font-family:"Fredoka", system-ui;
-    font-size:1.4rem;
+.home-title {
+    font-family:"Plus Jakarta Sans", system-ui;
+    font-size:1.6rem;
     font-weight:700;
-    margin-bottom:0.4rem;
+    margin-bottom:0.25rem;
 }
-.home-subline {
+.home-subtitle {
     font-size:0.95rem;
     color:#e5e7eb;
-    margin-bottom:0.4rem;
+    margin-bottom:0.5rem;
 }
 .home-desc {
-    font-size:0.8rem;
+    font-size:0.82rem;
     color:#9ca3af;
     max-width:640px;
     margin-bottom:1.2rem;
 }
 
 /* feature cards row */
-.home-feature-card {
+.feature-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap:0.9rem;
+}
+.feature-card {
     border-radius:14px;
-    border:1px solid rgba(148,163,184,0.5);
-    background:#020617;
-    padding:0.9rem;
+    border:1px solid rgba(148,163,184,0.45);
+    background:rgba(15,23,42,0.98);
+    padding:0.9rem 1rem;
     font-size:0.82rem;
 }
-.home-feature-title {
+.feature-title {
     font-weight:600;
     margin-bottom:0.2rem;
 }
-.home-feature-desc {
+.feature-desc {
     font-size:0.78rem;
     color:#9ca3af;
-    margin-bottom:0.6rem;
+    margin-bottom:0.7rem;
 }
-.home-feature-btn {
-    padding:0.4rem 0.9rem;
+.feature-btn {
+    padding:0.4rem 0.95rem;
     border-radius:999px;
     border:none;
     background:#22c55e;
@@ -294,29 +308,31 @@ section[data-testid="stSidebar"] * {
     font-size:0.8rem;
     font-weight:600;
 }
-.home-card-footer {
+
+/* footer note inside main card */
+.surface-footer-row {
     display:flex;
     align-items:center;
     justify-content:space-between;
     flex-wrap:wrap;
     gap:0.5rem;
-    font-size:0.75rem;
+    margin-top:0.9rem;
+    font-size:0.78rem;
     color:#9ca3af;
-    margin-top:0.5rem;
 }
-.home-card-ready-pill {
-    padding:0.2rem 0.9rem;
+.surface-footer-pill {
+    padding:0.2rem 0.85rem;
     border-radius:999px;
-    background:#020617;
-    border:1px solid rgba(34,197,94,0.7);
+    background:rgba(15,23,42,0.96);
+    border:1px solid rgba(34,197,94,0.8);
 }
 
 /* section titles */
 .section {
-    margin: 1.8rem 0;
+    margin: 1.7rem 0;
 }
 .section-title {
-    font-size:1.0rem;
+    font-size:0.98rem;
     font-weight:600;
     color:#e5e7eb;
     margin-bottom:0.25rem;
@@ -330,13 +346,13 @@ section[data-testid="stSidebar"] * {
 /* top careers row */
 .top-careers-grid {
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap:0.9rem;
 }
 .top-career-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.45);
-    background:#020617;
+    background:rgba(15,23,42,0.98);
     padding:0.9rem;
     font-size:0.8rem;
     color:#e5e7eb;
@@ -345,7 +361,7 @@ section[data-testid="stSidebar"] * {
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:0.2rem;
+    margin-bottom:0.25rem;
 }
 .top-career-role {
     font-weight:600;
@@ -355,17 +371,17 @@ section[data-testid="stSidebar"] * {
     color:#facc15;
 }
 .top-career-meta {
-    font-size:0.75rem;
+    font-size:0.76rem;
     color:#9ca3af;
-    margin-bottom:0.5rem;
+    margin-bottom:0.55rem;
 }
 .progress-bar {
     width:100%;
-    height:8px;
+    height:7px;
     border-radius:999px;
-    background:#020617;
+    background:rgba(15,23,42,0.9);
     overflow:hidden;
-    margin-bottom:0.3rem;
+    margin-bottom:0.35rem;
 }
 .progress-fill {
     height:100%;
@@ -373,7 +389,7 @@ section[data-testid="stSidebar"] * {
     background:linear-gradient(90deg,#22c55e,#a3e635);
 }
 .top-career-tag {
-    font-size:0.7rem;
+    font-size:0.72rem;
     color:#a5b4fc;
 }
 
@@ -386,8 +402,8 @@ section[data-testid="stSidebar"] * {
 .career-details-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.45);
-    background:#020617;
-    padding:0.9rem;
+    background:rgba(15,23,42,0.98);
+    padding:0.95rem;
     font-size:0.8rem;
     color:#e5e7eb;
 }
@@ -396,20 +412,21 @@ section[data-testid="stSidebar"] * {
     margin:0.3rem 0 0 0;
 }
 .career-details-card li {
-    margin-bottom:0.2rem;
+    margin-bottom:0.22rem;
 }
 
-/* form inputs inside cards */
-.page-card .stTextInput > div > input,
-.page-card .stTextArea > div > textarea {
-    background: #020617;
-    border-radius: 10px;
-    border: 1px solid rgba(148,163,184,0.6);
-    color: #e5e7eb;
+/* form inputs inside page cards */
+.surface-card .stTextInput > div > input,
+.surface-card .stTextArea > div > textarea {
+    background: rgba(15,23,42,0.96);
+    border-radius:10px;
+    border:1px solid rgba(148,163,184,0.6);
+    color:#e5e7eb;
+    font-size:0.86rem;
 }
-.page-card .stTextInput > label,
-.page-card .stTextArea > label {
-    font-size: 0.8rem;
+.surface-card .stTextInput > label,
+.surface-card .stTextArea > label {
+    font-size:0.8rem;
 }
 
 /* footer */
@@ -418,24 +435,25 @@ section[data-testid="stSidebar"] * {
     color:#e5e7eb;
 }
 .footer-inner {
-    max-width:1180px;
+    max-width:1120px;
     margin:0 auto;
-    padding:1.4rem 1rem 2rem 1rem;
+    padding:1.4rem 0.9rem 2rem 0.9rem;
     display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap:1rem;
     font-size:0.8rem;
 }
 .footer-logo {
     font-weight:600;
-    margin-bottom:0.25rem;
+    margin-bottom:0.3rem;
 }
 .footer-col-title {
     font-weight:600;
-    margin-bottom:0.3rem;
+    margin-bottom:0.35rem;
 }
 .footer-link {
     color:#9ca3af;
+    margin-bottom:0.18rem;
 }
 .footer-link a {
     color:#9ca3af;
@@ -448,11 +466,20 @@ section[data-testid="stSidebar"] * {
 /* mobile */
 @media (max-width: 640px) {
     .app-root {
-        padding:0.6rem 0.6rem 3rem 0.6rem;
+        padding:0.6rem 0.4rem 3rem 0.4rem;
     }
-    .home-main-card,
-    .page-card {
-        padding:1.1rem 1.2rem;
+    .surface-card {
+        padding:1.2rem 1.2rem;
+    }
+    .splash-card {
+        margin:0 1rem;
+        padding:1.8rem 1.6rem;
+    }
+    .splash-title-main {
+        font-size:1.25rem;
+    }
+    .splash-welcome {
+        font-size:2.0rem;
     }
 }
 </style>
@@ -466,8 +493,7 @@ def show_splash():
     html = """
     <div class="splash-layer">
       <div class="splash-card">
-        <div class="splash-gradient-orb-left"></div>
-        <div class="splash-gradient-orb-right"></div>
+        <div class="splash-accent-orb"></div>
         <div class="splash-card-inner">
           <div class="splash-pill">
             <div class="splash-pill-dot"></div>
@@ -476,19 +502,19 @@ def show_splash():
           <div class="splash-welcome">WELCOME</div>
           <div class="splash-title-main">AI Career Guidance System</div>
           <div class="splash-subline">
-            Welcome to AI Career Guidance System created by Niyaz Khan.
+            Smart, AI-powered career guidance for students, freshers, and career switchers.
           </div>
           <div class="splash-desc">
-            A smart, AI-powered guide to help you choose your path, grow your skills,
-            and shape your career future.
+            Get personalised career paths, skill roadmaps, and learning suggestions –
+            all generated by AI based on your goals, skills, and interests.
           </div>
           <div class="splash-buttons">
-            <button class="splash-btn-primary">Get Started</button>
-            <button class="splash-btn-secondary">Learn more</button>
+            <button class="splash-btn-primary">Get started</button>
+            <button class="splash-btn-secondary">View dashboard</button>
           </div>
           <div class="splash-footer-row">
-            <span>AI-powered insights · Personalized roadmaps</span>
-            <span class="splash-ready-pill">Ready when you are</span>
+            <span>AI-powered insights · Skill-first planning · India focused</span>
+            <span class="splash-ready-pill">Ready whenever you are</span>
           </div>
         </div>
       </div>
@@ -601,74 +627,78 @@ with st.sidebar:
 def page_home():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
 
-    # main card
-    st.markdown('<div class="home-main-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
     st.markdown(
         """
-        <div class="home-pill">
-          <div class="home-pill-dot"></div>
-          <span>Created by <strong>Niyaz Khan</strong></span>
+        <div class="home-badge">
+          <div class="home-badge-dot"></div>
+          <span>Career assistant by <strong>Niyaz Khan</strong></span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="home-title-main">AI Career Guidance System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="home-title">AI Career Guidance System</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="home-subline">Welcome to AI Career Guidance System created by Niyaz Khan.</div>',
+        '<div class="home-subtitle">Plan your next career move with data-backed, AI-generated suggestions.</div>',
         unsafe_allow_html=True,
     )
     st.markdown(
         """
         <div class="home-desc">
-          A smart, AI-powered guide to help you explore options, make informed career decisions,
-          and grow with confidence in a rapidly changing world of work.
+          Answer a few questions, get curated role suggestions, growth paths, and learning plans
+          based on your skills, interests, and target role – built specially for Indian students
+          and freshers entering tech.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    st.markdown('<div class="feature-grid">', unsafe_allow_html=True)
+
     col1, col2 = st.columns(2, gap="medium")
 
     with col1:
-        st.markdown('<div class="home-feature-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-feature-title">Career Chart</div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-title">🎯 Career Chart</div>', unsafe_allow_html=True)
         st.markdown(
-            '<div class="home-feature-desc">Ask questions, explore options, and talk to your AI mentor about roles, skills, and next steps in your path.</div>',
+            '<div class="feature-desc">High-level map of your options: stages, possible roles, and the direction you should move in.</div>',
             unsafe_allow_html=True,
         )
-        if st.button("Get Career Chart", key="home_chart_btn"):
+        if st.button("Open Career Chart", key="home_chart_btn"):
             st.session_state["active_page"] = "Career Chart"
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:
-        st.markdown('<div class="home-feature-card">', unsafe_allow_html=True)
-        st.markdown('<div class="home-feature-title">Career Guide</div>', unsafe_allow_html=True)
+        st.markdown('<div class="feature-card">', unsafe_allow_html=True)
+        st.markdown('<div class="feature-title">🧠 Full Career Guide</div>', unsafe_allow_html=True)
         st.markdown(
-            '<div class="home-feature-desc">Follow a guided path with personalized roadmaps, milestones, and resources tailored to your goals.</div>',
+            '<div class="feature-desc">Detailed report with 4 best-fit roles, skills to build, salary ranges, and learning resources.</div>',
             unsafe_allow_html=True,
         )
-        if st.button("Let\'s Guide", key="home_guide_btn"):
+        if st.button("Open Career Guide", key="home_guide_btn"):
             st.session_state["active_page"] = "Career Guide"
             st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
     st.markdown(
         """
-        <div class="home-card-footer">
-          <span>AI-powered insights · Personalized roadmaps</span>
-          <span class="home-card-ready-pill">Ready when you are</span>
+        <div class="surface-footer-row">
+          <span>AI-powered insights · Built for CS/IT, analytics & tech-aligned roles</span>
+          <span class="surface-footer-pill">Start with one profile today</span>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown("</div>", unsafe_allow_html=True)  # card
+    st.markdown("</div>", unsafe_allow_html=True)  # surface-card
 
     # Top careers row
     st.markdown('<div class="section">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Top Careers for You</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Top careers we usually recommend</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="section-sub">Balanced market demand, salary growth, and skill match.</div>',
+        '<div class="section-sub">Based on demand, growth, and entry options for Indian graduates.</div>',
         unsafe_allow_html=True,
     )
 
@@ -680,9 +710,9 @@ def page_home():
               <span class="top-career-role">Software Engineer</span>
               <span class="top-career-rating">4.7 / 5 ⭐</span>
             </div>
-            <div class="top-career-meta">Salary: 6–24 LPA · Skill growth</div>
+            <div class="top-career-meta">6–24 LPA · Strong product & service demand</div>
             <div class="progress-bar"><div class="progress-fill" style="width:88%;"></div></div>
-            <div class="top-career-tag">🚀 Strong demand across product & service companies.</div>
+            <div class="top-career-tag">Good if you enjoy coding, problem solving, and building products.</div>
           </div>
 
           <div class="top-career-card">
@@ -690,19 +720,19 @@ def page_home():
               <span class="top-career-role">Data Analyst</span>
               <span class="top-career-rating">4.5 / 5 ⭐</span>
             </div>
-            <div class="top-career-meta">Salary: 5–18 LPA · Work–life balance</div>
+            <div class="top-career-meta">5–18 LPA · Business + analytics hybrid</div>
             <div class="progress-bar"><div class="progress-fill" style="width:82%;"></div></div>
-            <div class="top-career-tag">📊 Great for analytical & business-leaning profiles.</div>
+            <div class="top-career-tag">Great fit if you like numbers, dashboards, and business insights.</div>
           </div>
 
           <div class="top-career-card">
             <div class="top-career-name-row">
-              <span class="top-career-role">Product Manager</span>
-              <span class="top-career-rating">4.3 / 5 ⭐</span>
+              <span class="top-career-role">DevOps / Cloud Engineer</span>
+              <span class="top-career-rating">4.4 / 5 ⭐</span>
             </div>
-            <div class="top-career-meta">Salary: 10–35 LPA · Leadership track</div>
-            <div class="progress-bar"><div class="progress-fill" style="width:78%;"></div></div>
-            <div class="top-career-tag">🧭 Combines tech, business & communication.</div>
+            <div class="top-career-meta">7–28 LPA · High growth & infra-focused</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:80%;"></div></div>
+            <div class="top-career-tag">Best for people who enjoy automation, reliability, and tooling.</div>
           </div>
         </div>
         """,
@@ -712,9 +742,9 @@ def page_home():
 
     # career details section
     st.markdown('<div class="section">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Career details & next steps</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">How to use this tool effectively</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="section-sub">Why these careers fit you, and what you should do now.</div>',
+        '<div class="section-sub">Use the guide as a starting point – then iterate based on your learning speed and interest.</div>',
         unsafe_allow_html=True,
     )
 
@@ -722,19 +752,19 @@ def page_home():
         """
         <div class="career-details-grid">
           <div class="career-details-card">
-            <strong>Why these careers match you</strong>
+            <strong>What the AI does for you</strong>
             <ul>
-              <li>Align with common CS / IT skills and learning style.</li>
-              <li>Strong long-term demand in India & globally.</li>
-              <li>Clear roadmap from beginner projects to advanced roles.</li>
+              <li>Maps your skills & interests to realistic job roles.</li>
+              <li>Highlights missing skills instead of only telling you what you already know.</li>
+              <li>Suggests learning paths that are achievable in 3–6 months.</li>
             </ul>
           </div>
           <div class="career-details-card">
-            <strong>What you should do next</strong>
+            <strong>What you should focus on now</strong>
             <ul>
-              <li>Pick 2–3 core skills and build consistency for 2–3 months.</li>
-              <li>Follow a curated playlist of tutorials + practice projects.</li>
-              <li>Publish your work on GitHub & LinkedIn to build proof.</li>
+              <li>Pick one target role and commit for at least 8–12 weeks.</li>
+              <li>Build 2–3 small projects and share them on GitHub & LinkedIn.</li>
+              <li>Track progress weekly instead of comparing with others daily.</li>
             </ul>
           </div>
         </div>
@@ -750,12 +780,12 @@ def page_home():
 # -----------------------------------------------------
 def page_career_chart():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
     st.markdown("#### 📊 AI Career Chart", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "Get a quick, high-level view of your career direction based on your skills & interests."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "Get a high-level view of your possible path from today to senior roles."
         "</p>",
         unsafe_allow_html=True,
     )
@@ -785,12 +815,12 @@ def page_career_chart():
 # -----------------------------------------------------
 def page_career_guide():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
-    st.markdown("#### 🧠 AI Career Guide", unsafe_allow_html=True)
+    st.markdown("#### 🧠 Full AI Career Guide", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "Fill this once to get a full, detailed roadmap including roles, skills, salary and resources."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "Fill this once to generate a detailed report with roles, skills, salary ranges and learning resources."
         "</p>",
         unsafe_allow_html=True,
     )
@@ -834,23 +864,23 @@ def page_career_guide():
 # -----------------------------------------------------
 def page_library():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
     st.markdown("#### 📚 Learning Library", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "Curated resources to learn faster. Later you can replace these with your own playlists."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "Starter list of resources. Later you can replace these with your own curated playlists."
         "</p>",
         unsafe_allow_html=True,
     )
 
     st.markdown(
         """
-- **Data Science** – Kaggle, fast.ai, Analytics Vidhya  
-- **Web Development** – MDN, FreeCodeCamp, Frontend Mentor  
-- **DevOps** – KodeKloud, Kubernetes docs, AWS free tier labs  
+- **Data Science / ML** – Kaggle, fast.ai, Analytics Vidhya  
+- **Web Development** – MDN Docs, FreeCodeCamp, Frontend Mentor  
+- **DevOps & Cloud** – KodeKloud labs, Kubernetes docs, AWS free tier  
 - **System Design** – Grokking System Design, Gaurav Sen, Hussein Nasser  
-- **Interview Prep** – LeetCode, InterviewBit, Striver’s DSA Sheet  
+- **DSA & Interviews** – LeetCode, InterviewBit, Striver’s DSA Sheet  
         """
     )
 
@@ -862,12 +892,12 @@ def page_library():
 # -----------------------------------------------------
 def page_history():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
-    st.markdown("#### 📚 Career Guidance History", unsafe_allow_html=True)
+    st.markdown("#### 📁 Career Guidance History", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "All guidance generated in this session is saved here so you can revisit it anytime."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "All reports generated in this session are stored here."
         "</p>",
         unsafe_allow_html=True,
     )
@@ -896,12 +926,12 @@ def page_history():
 # -----------------------------------------------------
 def page_settings():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
     st.markdown("#### ⚙️ Settings", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "Manage your session data and future options here."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "Control what is stored in your current session."
         "</p>",
         unsafe_allow_html=True,
     )
@@ -918,26 +948,26 @@ def page_settings():
 # -----------------------------------------------------
 def page_about():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
     st.markdown("#### ℹ️ About this Project", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "Built as a personal project by Niyaz Khan to guide students and freshers in tech careers."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "Built as a personal project by Niyaz Khan to guide Indian students and freshers in tech careers."
         "</p>",
         unsafe_allow_html=True,
     )
 
     st.markdown(
         """
-**AI Career Guidance System** is a personal project created by **Niyaz Khan** to help:
+**AI Career Guidance System** is designed to help:
 
-- Students exploring tech & business careers  
-- Freshers choosing between roles like DevOps, Data, Backend, etc.  
+- Students exploring tech & business-aligned roles  
+- Freshers confused between DevOps, Data, Backend, etc.  
 - Professionals planning a career switch into IT / AI / Cloud  
 
-It uses **Large Language Models (LLMs)** via **Groq**, with a modern
-**Python + Streamlit** UI inspired by professional career platforms.
+The app uses **Large Language Models (LLMs)** via **Groq** with a
+modern **Python + Streamlit** frontend.
         """
     )
 
@@ -949,12 +979,12 @@ It uses **Large Language Models (LLMs)** via **Groq**, with a modern
 # -----------------------------------------------------
 def page_contact():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+    st.markdown('<div class="surface-card">', unsafe_allow_html=True)
 
     st.markdown("#### 📬 Contact", unsafe_allow_html=True)
     st.markdown(
-        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
-        "Reach out to me or send feedback about this AI career guidance tool."
+        "<p style='font-size:0.84rem;color:#9ca3af;margin-top:-0.25rem;'>"
+        "Send feedback or collaborate on improving this career guidance system."
         "</p>",
         unsafe_allow_html=True,
     )
@@ -967,7 +997,7 @@ def page_contact():
         if not name.strip() or not email.strip() or not message.strip():
             st.error("⚠️ Please fill all fields.")
         else:
-            st.success("✅ Message captured locally (you can connect this to email or DB later).")
+            st.success("✅ Message captured locally (you can connect this to email or a database later).")
 
     st.markdown("---")
     st.markdown("##### My Contact Details")
@@ -990,11 +1020,11 @@ def render_footer():
             <div>
               <div class="footer-logo">AI Career Guidance System</div>
               <div class="footer-link">
-                Smart, AI-powered suggestions to help you make better career decisions.
+                Built by Niyaz Khan · AI-powered planning for students & early-career professionals.
               </div>
             </div>
             <div>
-              <div class="footer-col-title">Quick Links</div>
+              <div class="footer-col-title">Navigation</div>
               <div class="footer-link">🏠 Home</div>
               <div class="footer-link">🧠 Career Guide</div>
               <div class="footer-link">📊 Career Chart</div>
@@ -1002,9 +1032,9 @@ def render_footer():
             </div>
             <div>
               <div class="footer-col-title">Support</div>
-              <div class="footer-link">❓ Help</div>
-              <div class="footer-link">📄 FAQ</div>
-              <div class="footer-link">🔐 Privacy Policy</div>
+              <div class="footer-link">❓ Help (coming soon)</div>
+              <div class="footer-link">📄 FAQ (coming soon)</div>
+              <div class="footer-link">🔐 Privacy Policy (coming soon)</div>
             </div>
             <div>
               <div class="footer-col-title">Contact & Social</div>
