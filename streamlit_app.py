@@ -25,7 +25,7 @@ if "history" not in st.session_state:
     st.session_state["history"] = []
 
 # -----------------------------------------------------
-# GLOBAL CSS (BANANI-LIKE)
+# GLOBAL CSS (BANANI-LIKE + NEW PAGE CARDS)
 # -----------------------------------------------------
 CSS = """
 <style>
@@ -222,9 +222,10 @@ section[data-testid="stSidebar"] * {
     font-size:0.75rem;
 }
 
-/* -------------- HOME MAIN CARD ---------------- */
+/* -------------- MAIN CARDS (HOME + PAGES) ---------------- */
 
-.home-main-card {
+.home-main-card,
+.page-card {
     background:rgba(15,23,42,0.97);
     border-radius:24px;
     border:1px solid rgba(148,163,184,0.45);
@@ -232,6 +233,7 @@ section[data-testid="stSidebar"] * {
     color:#e5e7eb;
     box-shadow:0 22px 55px rgba(0,0,0,0.85);
 }
+
 .home-pill {
     display:inline-flex;
     align-items:center;
@@ -397,6 +399,19 @@ section[data-testid="stSidebar"] * {
     margin-bottom:0.2rem;
 }
 
+/* form inputs inside cards */
+.page-card .stTextInput > div > input,
+.page-card .stTextArea > div > textarea {
+    background: rgba(15,23,42,0.9);
+    border-radius: 10px;
+    border: 1px solid rgba(148,163,184,0.6);
+    color: #e5e7eb;
+}
+.page-card .stTextInput > label,
+.page-card .stTextArea > label {
+    font-size: 0.8rem;
+}
+
 /* footer */
 .footer {
     background:#020617;
@@ -435,7 +450,8 @@ section[data-testid="stSidebar"] * {
     .app-root {
         padding:0.6rem 0.6rem 3rem 0.6rem;
     }
-    .home-main-card {
+    .home-main-card,
+    .page-card {
         padding:1.1rem 1.2rem;
     }
 }
@@ -734,7 +750,15 @@ def page_home():
 # -----------------------------------------------------
 def page_career_chart():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📊 AI Career Chart")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### 📊 AI Career Chart", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "Get a quick, high-level view of your career direction based on your skills & interests."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
     name = st.text_input("Your Name (optional)")
     skills = st.text_area("Your key skills", placeholder="e.g. Python, SQL, problem solving, communication")
@@ -754,13 +778,22 @@ def page_career_chart():
             st.write(overview)
 
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # CAREER GUIDE (FULL REPORT)
 # -----------------------------------------------------
 def page_career_guide():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 🧠 AI Career Guide")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### 🧠 AI Career Guide", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "Fill this once to get a full, detailed roadmap including roles, skills, salary and resources."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
     name = st.text_input("Your Name")
     interests = st.text_input("Your Interests (e.g. Coding, Finance, Design)")
@@ -794,14 +827,23 @@ def page_career_guide():
             st.write(advice)
 
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # LIBRARY
 # -----------------------------------------------------
 def page_library():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📚 Library")
-    st.write("Later you can replace these with your real curated resources.")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### 📚 Learning Library", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "Curated resources to learn faster. Later you can replace these with your own playlists."
+        "</p>",
+        unsafe_allow_html=True,
+    )
+
     st.markdown(
         """
 - **Data Science** – Kaggle, fast.ai, Analytics Vidhya  
@@ -811,6 +853,8 @@ def page_library():
 - **Interview Prep** – LeetCode, InterviewBit, Striver’s DSA Sheet  
         """
     )
+
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
@@ -818,11 +862,20 @@ def page_library():
 # -----------------------------------------------------
 def page_history():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📚 Career Guidance History")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### 📚 Career Guidance History", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "All guidance generated in this session is saved here so you can revisit it anytime."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
     hist = st.session_state["history"]
     if not hist:
         st.info("No history yet. Use AI Career Guide to generate your first report.")
+        st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
@@ -836,18 +889,28 @@ def page_history():
             st.write(item["advice"])
 
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # SETTINGS
 # -----------------------------------------------------
 def page_settings():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### ⚙️ Settings")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### ⚙️ Settings", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "Manage your session data and future options here."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
     if st.button("Clear Career Guidance History", use_container_width=True):
         st.session_state["history"] = []
         st.success("History cleared for this session.")
 
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
@@ -855,7 +918,15 @@ def page_settings():
 # -----------------------------------------------------
 def page_about():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### ℹ️ About")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### ℹ️ About this Project", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "Built as a personal project by Niyaz Khan to guide students and freshers in tech careers."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
     st.markdown(
         """
@@ -871,13 +942,22 @@ It uses **Large Language Models (LLMs)** via **Groq**, with a modern
     )
 
     st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # CONTACT
 # -----------------------------------------------------
 def page_contact():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
-    st.markdown("### 📬 Contact")
+    st.markdown('<div class="page-card">', unsafe_allow_html=True)
+
+    st.markdown("#### 📬 Contact", unsafe_allow_html=True)
+    st.markdown(
+        "<p style='font-size:0.85rem;color:#9ca3af;margin-top:-0.3rem;'>"
+        "Reach out to me or send feedback about this AI career guidance tool."
+        "</p>",
+        unsafe_allow_html=True,
+    )
 
     name = st.text_input("Your Name")
     email = st.text_input("Your Email")
@@ -889,12 +969,14 @@ def page_contact():
         else:
             st.success("✅ Message captured locally (you can connect this to email or DB later).")
 
-    st.markdown("#### My Contact Details")
+    st.markdown("---")
+    st.markdown("##### My Contact Details")
     st.markdown("- 📧 **Email**: [niyaz.kofficials@gmail.com](mailto:niyaz.kofficials@gmail.com)")
     st.markdown("- 📱 **Phone**: [+91 7751931035](tel:+917751931035)")
     st.markdown("- 🔗 **LinkedIn**: [linkedin.com/in/iamnk7](https://linkedin.com/in/iamnk7)")
     st.markdown("- 🐙 **GitHub**: [github.com/Iamnk07](https://github.com/Iamnk07)")
 
+    st.markdown("</div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
