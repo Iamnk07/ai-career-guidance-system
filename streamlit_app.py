@@ -3,7 +3,7 @@ from groq import Groq
 from datetime import datetime
 
 # -----------------------------------------------------
-# BASIC PAGE CONFIG
+# PAGE CONFIG
 # -----------------------------------------------------
 st.set_page_config(
     page_title="AI Career Guidance System",
@@ -12,584 +12,702 @@ st.set_page_config(
 )
 
 # -----------------------------------------------------
-# SESSION DEFAULTS
+# CUSTOM CSS FOR PRO UI
 # -----------------------------------------------------
-if "active_page" not in st.session_state:
-    st.session_state["active_page"] = "Home"
+st.markdown(
+    """
+    <style>
+        /* Global styles */
+        .stApp {
+            background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #020617 100%);
+            color: #e5e7eb;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                         "Segoe UI", sans-serif;
+        }
 
+        /* Main container */
+        .main-block {
+            background: rgba(15, 23, 42, 0.9);
+            border-radius: 24px;
+            padding: 1.8rem 2rem;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 22px 45px rgba(15, 23, 42, 0.9);
+        }
+
+        /* Title area */
+        .hero-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            background: linear-gradient(120deg, #38bdf8, #a855f7, #f97316);
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+        }
+
+        .hero-subtitle {
+            font-size: 0.95rem;
+            color: #cbd5f5;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            color: #e5e7eb;
+        }
+
+        .pill-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #22c55e;
+            box-shadow: 0 0 12px #22c55e;
+        }
+
+        .metric-card {
+            background: radial-gradient(circle at top left, #1f2937 0, #020617 70%);
+            border-radius: 18px;
+            padding: 0.9rem 1rem;
+            border: 1px solid rgba(31, 41, 55, 0.7);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+
+        .metric-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.55rem;
+            border-radius: 999px;
+            background: rgba(22, 163, 74, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            color: #bbf7d0;
+        }
+
+        /* Chat-like response box */
+        .ai-response {
+            background: radial-gradient(circle at top left, #0b1120 0, #020617 70%);
+            border-radius: 18px;
+            padding: 1rem 1.15rem;
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            margin-top: 0.75rem;
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        .ai-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 999px;
+            background: radial-gradient(circle at top, #38bdf8 0, #0f172a 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #e5e7eb;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+        }
+
+        /* Tabs */
+        button[data-baseweb="tab"] {
+            font-size: 0.85rem !important;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(31, 41, 55, 0.8);
+            font-size: 0.8rem;
+            color: #9ca3af;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            row-gap: 0.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .footer a {
+            color: #e5e7eb;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 1.6rem;
+            }
+            .main-block {
+                padding: 1.2rem 1.15rem;
+            }
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# -----------------------------------------------------
+# INIT SESSION
+# -----------------------------------------------------
 if "history" not in st.session_state:
-    st.session_state["history"] = []
+    st.session_state.history = []
 
 # -----------------------------------------------------
-# GLOBAL MINIMAL CSS (SIMPLE + OFFICIAL)
+# GROQ CLIENT
 # -----------------------------------------------------
-BASE_CSS = """
-<style>
-/* Font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-html, body, [class*="css"] {
-    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-/* Background */
-.stApp {
-    background: #f3f4f6;
-}
-
-/* Main container */
-.app-wrapper {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 1.5rem 1rem 3rem 1rem;
-}
-
-/* Simple card */
-.app-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 1.5rem 1.5rem;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
-}
-
-/* Section titles */
-.app-section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 0.15rem;
-    color: #111827;
-}
-.app-section-subtitle {
-    font-size: 0.85rem;
-    color: #6b7280;
-    margin-bottom: 0.8rem;
-}
-
-/* Home hero */
-.hero-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.25rem;
-}
-.hero-subtitle {
-    font-size: 0.95rem;
-    color: #4b5563;
-    margin-bottom: 0.4rem;
-}
-.hero-tag {
-    display: inline-block;
-    padding: 0.18rem 0.75rem;
-    font-size: 0.78rem;
-    border-radius: 999px;
-    background: #ecfeff;
-    color: #0369a1;
-    border: 1px solid #bae6fd;
-    margin-bottom: 0.6rem;
-}
-
-/* Simple feature cards */
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 0.9rem;
-    margin-top: 0.8rem;
-}
-.feature-card {
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    padding: 0.9rem 1rem;
-    background: #f9fafb;
-    font-size: 0.85rem;
-}
-.feature-card-title {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: #111827;
-}
-.feature-card-text {
-    font-size: 0.82rem;
-    color: #6b7280;
-}
-
-/* Footer */
-.footer {
-    border-top: 1px solid #e5e7eb;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    font-size: 0.8rem;
-    color: #6b7280;
-}
-.footer-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 1rem;
-}
-.footer-title {
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 0.25rem;
-}
-.footer-link a {
-    color: #4b5563;
-    text-decoration: none;
-}
-.footer-link a:hover {
-    text-decoration: underline;
-}
-
-/* Mobile adjustments */
-@media (max-width: 640px) {
-    .app-wrapper {
-        padding: 1rem 0.6rem 2.5rem 0.6rem;
-    }
-    .app-card {
-        padding: 1.2rem 1.1rem;
-    }
-}
-</style>
-"""
-st.markdown(BASE_CSS, unsafe_allow_html=True)
-
-# -----------------------------------------------------
-# GROQ CLIENT & HELPERS
-# -----------------------------------------------------
-@st.cache_resource
-def get_client():
+@st.cache_resource(show_spinner=False)
+def get_groq_client():
     return Groq(api_key=st.secrets["GROQ_API_KEY"])
 
-client = get_client()
 
-def call_groq(prompt: str) -> str:
-    try:
-        resp = client.chat.completions.create(
-            model="openai/gpt-oss-20b",   # keep a stable model you can access
-            messages=[{"role": "user", "content": prompt}],
+client = get_groq_client()
+
+# -----------------------------------------------------
+# LLM CALLER
+# -----------------------------------------------------
+SYSTEM_PROMPT = """
+You are an AI Career Guidance Assistant created for students and early-career professionals.
+You must be:
+- Specific, practical and structured.
+- Clear about SHORT-TERM (0–3 months), MID-TERM (3–12 months) and LONG-TERM (1–3 years) steps.
+- Focused on tech roles like Software Engineer, Data Scientist, ML Engineer, DevOps, etc., but able to advise any knowledge role.
+Return answers in clean markdown with headings, bullet points, and tables when useful.
+Keep language friendly, simple and motivating.
+"""
+
+def get_career_guidance(user_profile: dict, mode: str = "career") -> str:
+    """
+    mode:
+      - 'career'   : overall direction + roadmap
+      - 'skills'   : skill gap and learning plan
+      - 'interview': interview prep tips & sample Qs
+    """
+    profile_text = f"""
+Name: {user_profile.get("name") or "Not provided"}
+Current Education: {user_profile.get("education")}
+Degree / Branch: {user_profile.get("degree")}
+Year / Experience: {user_profile.get("year_or_exp")}
+Key Skills: {", ".join(user_profile.get("skills", [])) or "Not specified"}
+Other Skills (text): {user_profile.get("skills_text") or "Not specified"}
+Interests: {", ".join(user_profile.get("interests", [])) or "Not specified"}
+Preferred Roles: {user_profile.get("preferred_roles") or "Not specified"}
+Target Domain: {user_profile.get("target_domain") or "Not specified"}
+Location Preference: {user_profile.get("location_pref") or "Not specified"}
+Work Style: {user_profile.get("work_style") or "Not specified"}
+Risk Preference: {user_profile.get("risk_pref") or "Not specified"}
+Priority: {user_profile.get("priority") or "Not specified"}
+Extra Notes: {user_profile.get("notes") or "None"}
+    """
+
+    if mode == "career":
+        task = "Give a detailed, practical career guidance plan and next steps."
+    elif mode == "skills":
+        task = (
+            "Do a skill-gap analysis for the target roles and suggest a structured "
+            "learning roadmap with resources categories (not links)."
         )
-        return resp.choices[0].message.content
-    except Exception as e:
-        return f"❌ API Error: {e}"
+    else:  # interview
+        task = (
+            "Help with interview preparation: key topics, how to tell their story, "
+            "and 8–10 targeted sample questions with strong answer outlines."
+        )
 
-def get_career_advice(interests, skills, education, goals):
-    prompt = f"""
-You are an expert AI career counselor for Indian students.
+    user_message = f"""{task}
 
-Interests: {interests}
-Skills: {skills}
-Education: {education}
-Career Goals: {goals}
-
-Provide structured, detailed career guidance including:
-
-1. Best 4 Career Options  
-2. Required Skills  
-3. Missing Skills & How to Improve  
-4. Step-by-step Career Roadmap  
-5. Salary Range in INR  
-6. Best Learning Resources  
-7. Resume Tips  
-8. Interview Preparation Tips
-
-Use clear headings and bullet points.
+User Profile:
+{profile_text}
 """
-    return call_groq(prompt)
 
-def get_career_chart_overview(name, skills, interests):
-    prompt = f"""
-You are an AI career mentor. Create a clear career chart overview.
-
-Name: {name}
-Skills: {skills}
-Interests: {interests}
-
-Provide:
-
-1. Short profile summary  
-2. 3–5 suitable career paths  
-3. A simple career chart:
-   - Stage 1: Where they are now
-   - Stage 2: Next 1–2 roles
-   - Stage 3: Senior roles
-4. Key skills to focus on  
-5. Suggested learning plan (bullet points)
-
-Keep it concise but useful.
-"""
-    return call_groq(prompt)
-
-# -----------------------------------------------------
-# SIDEBAR NAVIGATION
-# -----------------------------------------------------
-NAV_ITEMS = [
-    "Home",
-    "Career Chart",
-    "Career Guide",
-    "Library",
-    "History",
-    "Settings",
-    "About",
-    "Contact",
-]
-
-with st.sidebar:
-    st.markdown("### AI Career Guidance")
-    st.caption("Created by **Niyaz Khan**")
-    st.write("---")
-
-    choice = st.radio(
-        "Navigation",
-        NAV_ITEMS,
-        index=NAV_ITEMS.index(st.session_state["active_page"]),
+    completion = client.chat.completions.create(
+        model="openai/gpt-oss-20b",
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+        temperature=0.6,
+        max_tokens=2048,
     )
-    st.session_state["active_page"] = choice
+    return completion.choices[0].message.content
+
 
 # -----------------------------------------------------
-# PAGES
+# HEADER / HERO
 # -----------------------------------------------------
-def page_home():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
-
-    st.markdown('<div class="hero-tag">AI-powered career planning for students & freshers in India</div>', unsafe_allow_html=True)
-    st.markdown('<div class="hero-title">AI Career Guidance System</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="hero-subtitle">Get career options, growth paths, skills to learn, and learning resources – all from one place.</div>',
-        unsafe_allow_html=True,
-    )
-
+col_logo, col_title = st.columns([0.18, 0.82])
+with col_logo:
     st.markdown(
         """
-        <p style="font-size:0.86rem; color:#4b5563; margin-top:0.4rem;">
-        Start with a quick career chart, or generate a detailed AI career guidance report.
-        </p>
+        <div style="width:70px;height:70px;border-radius:24px;
+                    background:radial-gradient(circle at top,#38bdf8,#1d4ed8,#020617);
+                    display:flex;align-items:center;justify-content:center;
+                    border:1px solid rgba(148,163,184,0.7);">
+            <span style="font-size:1.8rem;">🧭</span>
+        </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Quick feature overview
-    st.markdown('<div class="feature-grid">', unsafe_allow_html=True)
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-card-title">📊 Career Chart</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="feature-card-text">High-level view of your path: entry role, mid-level roles, and senior positions.</div>',
-            unsafe_allow_html=True,
-        )
-        if st.button("Open Career Chart", key="go_chart"):
-            st.session_state["active_page"] = "Career Chart"
-            st.experimental_rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col2:
-        st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-card-title">🧠 Career Guide</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="feature-card-text">Detailed report with 4 best-fit roles, skills, salary bands, and learning plan.</div>',
-            unsafe_allow_html=True,
-        )
-        if st.button("Open Career Guide", key="go_guide"):
-            st.session_state["active_page"] = "Career Guide"
-            st.experimental_rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    with col3:
-        st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-        st.markdown('<div class="feature-card-title">📚 Library</div>', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="feature-card-text">List of reference resources for Data, Web, DevOps, DSA, and System Design.</div>',
-            unsafe_allow_html=True,
-        )
-        if st.button("Open Library", key="go_library"):
-            st.session_state["active_page"] = "Library"
-            st.experimental_rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)  # feature-grid
-
-    st.markdown("</div>", unsafe_allow_html=True)  # app-card
-    st.markdown("</div>", unsafe_allow_html=True)  # app-wrapper
-
-
-def page_career_chart():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
-
-    st.markdown('<div class="app-section-title">📊 AI Career Chart</div>', unsafe_allow_html=True)
+with col_title:
     st.markdown(
-        '<div class="app-section-subtitle">Get a high-level view of your career path from today to senior roles.</div>',
+        """
+        <div class="pill">
+            <span class="pill-dot"></span>
+            <span>AI-Powered • Career Guidance System</span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="hero-title">AI Career Guidance System</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="hero-subtitle">'
+        'Smart, personalised career direction for students & early-career professionals — '
+        'built with Groq, Streamlit and LLMs.'
+        "</div>",
         unsafe_allow_html=True,
     )
 
-    name = st.text_input("Your Name (optional)")
-    skills = st.text_area("Your Key Skills", placeholder="e.g. Python, SQL, problem solving, communication")
-    interests = st.text_area("Your Interests", placeholder="e.g. building apps, finance, design, research")
+st.markdown("")  # spacing
 
-    if st.button("Generate Career Chart", use_container_width=True):
-        if not skills.strip() or not interests.strip():
-            st.error("⚠️ Please fill at least skills and interests.")
-        else:
-            with st.spinner("Generating your AI career chart..."):
-                overview = get_career_chart_overview(
-                    name.strip() or "User",
-                    skills.strip(),
-                    interests.strip(),
-                )
-            st.markdown("### Your Career Chart Overview")
-            st.write(overview)
+left_metrics, right_metrics = st.columns([0.55, 0.45])
 
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-def page_career_guide():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
-
-    st.markdown('<div class="app-section-title">🧠 Full AI Career Guidance</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="app-section-subtitle">Fill this form once to generate a detailed career guidance report.</div>',
-        unsafe_allow_html=True,
+with left_metrics:
+    st.markdown('<div class="main-block">', unsafe_allow_html=True)
+    st.markdown("#### 🎯 What do you want to figure out today?")
+    st.write(
+        "Use the tabs below to get a **career roadmap**, discover **skill gaps**, "
+        "or prepare for **interviews** – all tailored to your profile."
     )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    name = st.text_input("Your Name")
-    interests = st.text_input("Your Interests (e.g. Coding, Finance, Design)")
-    skills = st.text_input("Your Skills (e.g. Python, Excel, Communication)")
-    education = st.text_input("Your Education (e.g. B.Tech CSE, B.Com)")
-    goals = st.text_input("Your Target Role (e.g. DevOps Engineer, Data Scientist)")
+with right_metrics:
+    st.markdown('<div class="main-block">', unsafe_allow_html=True)
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        st.markdown(
+            """
+            <div class="metric-card">
+                <div class="metric-label">Focus Area</div>
+                <div class="metric-value">Tech Careers</div>
+                <div class="metric-badge">Students & Freshers</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m2:
+        st.markdown(
+            """
+            <div class="metric-card">
+                <div class="metric-label">Guidance Style</div>
+                <div class="metric-value">Action-Oriented</div>
+                <div class="metric-badge">Roadmaps & Steps</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with m3:
+        st.markdown(
+            f"""
+            <div class="metric-card">
+                <div class="metric-label">Session</div>
+                <div class="metric-value">{datetime.now().strftime("%b %d")}</div>
+                <div class="metric-badge">Powered by Groq</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    if st.button("Generate Career Guidance", use_container_width=True):
-        if not all([name.strip(), interests.strip(), skills.strip(), education.strip(), goals.strip()]):
-            st.error("⚠️ Please fill all fields.")
-        else:
-            with st.spinner("Analyzing your profile and preparing guidance..."):
-                advice = get_career_advice(
-                    interests.strip(),
-                    skills.strip(),
-                    education.strip(),
-                    goals.strip(),
-                )
+st.markdown("")  # spacing
 
-            st.session_state["history"].append(
-                {
-                    "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "name": name.strip(),
-                    "interests": interests.strip(),
-                    "skills": skills.strip(),
-                    "education": education.strip(),
-                    "goals": goals.strip(),
-                    "advice": advice,
-                }
+# -----------------------------------------------------
+# TABS LAYOUT
+# -----------------------------------------------------
+tab1, tab2, tab3 = st.tabs(
+    ["🧭 Career Direction", "🧩 Skill Gap & Roadmap", "🎙️ Interview Prep"]
+)
+
+# Common fields
+EDU_OPTIONS = [
+    "B.Tech / B.E.",
+    "B.Sc",
+    "BCA",
+    "M.Tech / M.E.",
+    "M.Sc",
+    "MCA",
+    "Diploma",
+    "Working Professional",
+    "Other",
+]
+
+INTEREST_OPTIONS = [
+    "Software Development",
+    "Web Development",
+    "Mobile Apps",
+    "Data Science / Analytics",
+    "Machine Learning / AI",
+    "DevOps / Cloud",
+    "Cyber Security",
+    "Product Management",
+    "UI/UX & Design",
+]
+
+SKILL_OPTIONS = [
+    "Python",
+    "Java",
+    "C++",
+    "JavaScript",
+    "HTML/CSS",
+    "React",
+    "Node.js",
+    "SQL",
+    "MongoDB",
+    "Data Structures & Algorithms",
+    "Machine Learning",
+    "Deep Learning",
+    "Cloud (AWS / GCP / Azure)",
+    "Docker / Kubernetes",
+    "Linux",
+    "Power BI / Tableau",
+]
+
+# -----------------------------------------------------
+# TAB 1 – CAREER DIRECTION
+# -----------------------------------------------------
+with tab1:
+    left, right = st.columns([0.55, 0.45])
+
+    with left:
+        st.subheader("Tell me about yourself")
+        with st.form("career_form"):
+            name = st.text_input("Name (optional)", placeholder="Niyaz Khan")
+            education = st.selectbox("Current education level", EDU_OPTIONS, index=0)
+            degree = st.text_input(
+                "Degree / Branch / Major",
+                placeholder="B.Tech in Computer Science",
+            )
+            year_or_exp = st.text_input(
+                "Current year or experience",
+                placeholder="Final year / Fresher / 1 year exp, etc.",
             )
 
-            st.markdown("### Your AI Career Guidance")
-            st.write(advice)
+            skills = st.multiselect(
+                "Your current skills",
+                options=SKILL_OPTIONS,
+            )
+            skills_text = st.text_area(
+                "Other skills (optional)",
+                placeholder="e.g. Git, problem solving, communication, leadership…",
+                height=80,
+            )
 
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+            interests = st.multiselect(
+                "What are you interested in?",
+                options=INTEREST_OPTIONS,
+            )
 
+            preferred_roles = st.text_input(
+                "What kind of roles are you thinking about?",
+                placeholder="e.g. Software Engineer, Data Scientist, ML Engineer…",
+            )
+            target_domain = st.text_input(
+                "Target domain / industry (optional)",
+                placeholder="e.g. FinTech, AI startups, MNC, Remote product company…",
+            )
 
-def page_library():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
+            col_a, col_b, col_c = st.columns(3)
+            with col_a:
+                location_pref = st.selectbox(
+                    "Location preference",
+                    ["No preference", "Tier-1 cities", "Remote", "Abroad"],
+                )
+            with col_b:
+                work_style = st.selectbox(
+                    "Work style",
+                    ["No preference", "Office", "Hybrid", "Remote"],
+                )
+            with col_c:
+                risk_pref = st.selectbox(
+                    "Risk preference",
+                    ["Balanced", "Risk-taking (startups)", "Stable (MNC / service)"],
+                )
 
-    st.markdown('<div class="app-section-title">📚 Learning Library</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="app-section-subtitle">Basic list of resources. You can replace these with your own curated list later.</div>',
-        unsafe_allow_html=True,
-    )
+            priority = st.selectbox(
+                "What is your top priority right now?",
+                [
+                    "Get my first job / internship",
+                    "Build strong fundamentals",
+                    "Switch domain / role",
+                    "Higher studies planning",
+                ],
+            )
 
-    st.markdown(
-        """
-- **Data Science / ML** – Kaggle, fast.ai, Analytics Vidhya  
-- **Web Development** – MDN Docs, FreeCodeCamp, Frontend Mentor  
-- **DevOps & Cloud** – KodeKloud labs, Kubernetes docs, AWS free tier  
-- **System Design** – Grokking System Design, Gaurav Sen, Hussein Nasser  
-- **DSA & Interviews** – LeetCode, InterviewBit, Striver’s DSA Sheet  
-        """
-    )
+            notes = st.text_area(
+                "Anything else I should know?",
+                placeholder="Share your constraints, dreams, companies you like, etc.",
+            )
 
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+            submitted = st.form_submit_button("Generate Career Guidance 🚀")
 
+        if submitted:
+            profile = {
+                "name": name,
+                "education": education,
+                "degree": degree,
+                "year_or_exp": year_or_exp,
+                "skills": skills,
+                "skills_text": skills_text,
+                "interests": interests,
+                "preferred_roles": preferred_roles,
+                "target_domain": target_domain,
+                "location_pref": location_pref,
+                "work_style": work_style,
+                "risk_pref": risk_pref,
+                "priority": priority,
+                "notes": notes,
+            }
 
-def page_history():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
+            with st.spinner("Thinking about your profile and building a roadmap..."):
+                try:
+                    answer = get_career_guidance(profile, mode="career")
+                    st.session_state.history.append(
+                        {"mode": "career", "profile": profile, "answer": answer}
+                    )
+                except Exception as e:
+                    answer = f"❌ There was an error while contacting the model:\n\n`{e}`"
 
-    st.markdown('<div class="app-section-title">📁 Career Guidance History</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="app-section-subtitle">Reports generated in this session are listed here.</div>',
-        unsafe_allow_html=True,
-    )
+            st.markdown(
+                """
+                <div class="ai-response">
+                    <div class="ai-header">
+                        <div class="ai-avatar">AI</div>
+                        <div>AI Career Guide • Personalised plan</div>
+                    </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            st.markdown(answer)
+            st.markdown("</div>", unsafe_allow_html=True)
 
-    hist = st.session_state["history"]
-    if not hist:
-        st.info("No history yet. Use the AI Career Guide page to generate your first report.")
-    else:
-        for i, item in enumerate(reversed(hist), start=1):
-            label = f"{i}. {item['time']} — {item['name']} ({item['goals']})"
-            with st.expander(label):
-                st.write(f"**Interests:** {item['interests']}")
-                st.write(f"**Skills:** {item['skills']}")
-                st.write(f"**Education:** {item['education']}")
-                st.write(f"**Target Role:** {item['goals']}")
-                st.markdown("---")
-                st.write(item["advice"])
-
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-def page_settings():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
-
-    st.markdown('<div class="app-section-title">⚙️ Settings</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="app-section-subtitle">Manage data stored in this session.</div>',
-        unsafe_allow_html=True,
-    )
-
-    if st.button("Clear Career Guidance History", use_container_width=True):
-        st.session_state["history"] = []
-        st.success("History cleared for this session.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-def page_about():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
-
-    st.markdown('<div class="app-section-title">ℹ️ About This Project</div>', unsafe_allow_html=True)
-    st.markdown(
-        """
-**AI Career Guidance System** is a personal project by **Niyaz Khan**  
-to help Indian students and freshers explore realistic tech and tech-aligned careers.
-        """
-    )
-    st.markdown(
-        """
-The app is useful for:
-
-- Students exploring software, data, cloud, and business-aligned roles  
-- Freshers confused between options like DevOps, Data, Backend, etc.  
-- Professionals planning a career switch into IT / AI / Cloud  
-
-Technology used:
-
-- **Python + Streamlit** for the interface  
-- **Groq (LLMs)** for generating guidance  
-        """
-    )
-
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-def page_contact():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="app-card">', unsafe_allow_html=True)
-
-    st.markdown('<div class="app-section-title">📬 Contact</div>', unsafe_allow_html=True)
-    st.markdown(
-        '<div class="app-section-subtitle">Share feedback or connect for collaboration.</div>',
-        unsafe_allow_html=True,
-    )
-
-    name = st.text_input("Your Name")
-    email = st.text_input("Your Email")
-    message = st.text_area("Your Message", height=150)
-
-    if st.button("Send Message", use_container_width=True):
-        if not name.strip() or not email.strip() or not message.strip():
-            st.error("⚠️ Please fill all fields.")
+    with right:
+        st.subheader("Session History")
+        if not st.session_state.history:
+            st.info(
+                "No sessions yet. Submit the form on the left to generate your first "
+                "career guidance plan."
+            )
         else:
-            # You can later integrate email or DB here
-            st.success("✅ Message captured (locally). You can connect this to email or a database later.")
-
-    st.markdown("---")
-    st.markdown("#### My Contact & Social")
-    st.markdown("- 📧 **Email**: [niyaz.kofficials@gmail.com](mailto:niyaz.kofficials@gmail.com)")
-    st.markdown("- 📱 **Phone**: [+91 7751931035](tel:+917751931035)")
-    st.markdown("- 🔗 **LinkedIn**: [linkedin.com/in/iamnk7](https://linkedin.com/in/iamnk7)")
-    st.markdown("- 🐙 **GitHub**: [github.com/Iamnk07](https://github.com/Iamnk07)")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+            for i, item in enumerate(reversed(st.session_state.history[-5:]), start=1):
+                st.markdown(f"**#{i}. {item['mode'].title()} guidance**")
+                small_profile = item["profile"]
+                st.caption(
+                    f"{small_profile.get('education', '')} | "
+                    f"{small_profile.get('degree', '')} | "
+                    f"{small_profile.get('year_or_exp', '')}"
+                )
 
 # -----------------------------------------------------
-# FOOTER
+# TAB 2 – SKILL GAP & ROADMAP
 # -----------------------------------------------------
-def render_footer():
-    st.markdown('<div class="app-wrapper">', unsafe_allow_html=True)
-    st.markdown('<div class="footer">', unsafe_allow_html=True)
+with tab2:
+    st.subheader("Understand your skill gap and build a focused learning plan")
 
-    st.markdown('<div class="footer-grid">', unsafe_allow_html=True)
+    with st.form("skills_form"):
+        edu2 = st.selectbox("Current education / status", EDU_OPTIONS, key="edu2")
+        role_target = st.text_input(
+            "Target role(s)",
+            placeholder="e.g. Data Scientist, Backend Engineer, DevOps Engineer…",
+        )
+        skills2 = st.multiselect(
+            "Current skills",
+            options=SKILL_OPTIONS,
+            key="skills2",
+        )
+        skills2_text = st.text_area(
+            "Other skills / tools you know",
+            placeholder="e.g. pandas, NumPy, FastAPI, Firebase…",
+            height=80,
+            key="skills2_text",
+        )
+        time_per_week = st.slider(
+            "How many hours per week can you study?",
+            min_value=3,
+            max_value=40,
+            value=10,
+            step=1,
+        )
+        duration = st.selectbox(
+            "Planning horizon",
+            ["1 month", "3 months", "6 months"],
+            index=1,
+        )
 
-    col1, col2, col3 = st.columns(3)
+        notes2 = st.text_area(
+            "Constraints / preferences (optional)",
+            placeholder="e.g. Only free resources, can’t buy paid courses, weak in maths…",
+            key="notes2",
+        )
 
-    with col1:
-        st.markdown('<div class="footer-title">AI Career Guidance System</div>', unsafe_allow_html=True)
+        submit_skills = st.form_submit_button("Generate Skill Gap Analysis 📚")
+
+    if submit_skills:
+        profile2 = {
+            "name": None,
+            "education": edu2,
+            "degree": "",
+            "year_or_exp": "",
+            "skills": skills2,
+            "skills_text": skills2_text,
+            "interests": [],
+            "preferred_roles": role_target,
+            "target_domain": "",
+            "location_pref": "",
+            "work_style": "",
+            "risk_pref": "",
+            "priority": f"Skill growth over {duration}, {time_per_week} hrs/week",
+            "notes": notes2,
+        }
+        with st.spinner("Identifying gaps and designing a learning roadmap..."):
+            try:
+                answer2 = get_career_guidance(profile2, mode="skills")
+                st.session_state.history.append(
+                    {"mode": "skills", "profile": profile2, "answer": answer2}
+                )
+            except Exception as e:
+                answer2 = f"❌ There was an error while contacting the model:\n\n`{e}`"
+
         st.markdown(
-            '<div class="footer-link">Built by <strong>Niyaz Khan</strong> · AI-powered planning for students & early-career professionals.</div>',
+            """
+            <div class="ai-response">
+                <div class="ai-header">
+                    <div class="ai-avatar">AI</div>
+                    <div>Skill Gap Analysis • Learning Plan</div>
+                </div>
+            """,
             unsafe_allow_html=True,
         )
-
-    with col2:
-        st.markdown('<div class="footer-title">Pages</div>', unsafe_allow_html=True)
-        st.markdown('<div class="footer-link">Home</div>', unsafe_allow_html=True)
-        st.markdown('<div class="footer-link">Career Chart</div>', unsafe_allow_html=True)
-        st.markdown('<div class="footer-link">Career Guide</div>', unsafe_allow_html=True)
-        st.markdown('<div class="footer-link">Library</div>', unsafe_allow_html=True)
-
-    with col3:
-        st.markdown('<div class="footer-title">Contact</div>', unsafe_allow_html=True)
-        st.markmarkdown(
-            '<div class="footer-link"><a href="mailto:niyaz.kofficials@gmail.com">niyaz.kofficials@gmail.com</a></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="footer-link"><a href="tel:+917751931035">+91 7751931035</a></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="footer-link"><a href="https://linkedin.com/in/iamnk7" target="_blank">LinkedIn</a></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(
-            '<div class="footer-link"><a href="https://github.com/Iamnk07" target="_blank">GitHub</a></div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown('</div>', unsafe_allow_html=True)  # footer-grid
-    st.markdown('</div>', unsafe_allow_html=True)  # footer
-    st.markdown('</div>', unsafe_allow_html=True)  # app-wrapper
+        st.markdown(answer2)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# ROUTER
+# TAB 3 – INTERVIEW PREP
 # -----------------------------------------------------
-page = st.session_state["active_page"]
+with tab3:
+    st.subheader("Prepare for interviews with targeted guidance")
 
-if page == "Home":
-    page_home()
-elif page == "Career Chart":
-    page_career_chart()
-elif page == "Career Guide":
-    page_career_guide()
-elif page == "Library":
-    page_library()
-elif page == "History":
-    page_history()
-elif page == "Settings":
-    page_settings()
-elif page == "About":
-    page_about()
-elif page == "Contact":
-    page_contact()
+    with st.form("interview_form"):
+        role_int = st.text_input(
+            "Target role",
+            placeholder="e.g. SDE-1, Data Analyst, DevOps Engineer…",
+        )
+        company_type = st.selectbox(
+            "Company type",
+            ["Product (FAANG / MAANG style)", "Service (TCS / Infosys etc.)", "Startup", "Any"],
+        )
+        experience_int = st.text_input(
+            "Experience level",
+            placeholder="e.g. Final year / Fresher / 1 year experience…",
+        )
+        strong_areas = st.text_area(
+            "Strong areas",
+            placeholder="e.g. DSA, DBMS, OS, OOP, projects in web dev / ML…",
+            height=80,
+        )
+        weak_areas = st.text_area(
+            "Weak areas",
+            placeholder="e.g. System design, probability & stats, communication…",
+            height=80,
+        )
+        upcoming = st.text_input(
+            "Any upcoming interview / company? (optional)",
+            placeholder="e.g. TCS NQT, Infosys, J.P. Morgan virtual internship, etc.",
+        )
 
-render_footer()
+        submit_int = st.form_submit_button("Generate Interview Prep Plan 🎙️")
+
+    if submit_int:
+        profile3 = {
+            "name": None,
+            "education": "",
+            "degree": "",
+            "year_or_exp": experience_int,
+            "skills": [],
+            "skills_text": strong_areas,
+            "interests": [],
+            "preferred_roles": role_int,
+            "target_domain": company_type,
+            "location_pref": "",
+            "work_style": "",
+            "risk_pref": "",
+            "priority": "Interview preparation",
+            "notes": f"Weak areas: {weak_areas}\nUpcoming: {upcoming}",
+        }
+        with st.spinner("Designing interview strategy, topics and sample questions..."):
+            try:
+                answer3 = get_career_guidance(profile3, mode="interview")
+                st.session_state.history.append(
+                    {"mode": "interview", "profile": profile3, "answer": answer3}
+                )
+            except Exception as e:
+                answer3 = f"❌ There was an error while contacting the model:\n\n`{e}`"
+
+        st.markdown(
+            """
+            <div class="ai-response">
+                <div class="ai-header">
+                    <div class="ai-avatar">AI</div>
+                    <div>Interview Prep • Strategy & Sample Qs</div>
+                </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        st.markdown(answer3)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# -----------------------------------------------------
+# FOOTER WITH YOUR CONTACTS / SOCIALS
+# -----------------------------------------------------
+st.markdown(
+    """
+    <div class="footer">
+        <div>© 2025 AI Career Guidance • Built with ❤️ by Niyaz</div>
+        <div class="footer-links">
+            <span>📧 <a href="mailto:niyaz.kofficials@gmail.com">niyaz.kofficials@gmail.com</a></span>
+            <span>📱 <a href="tel:+917751931035">+91 7751931035</a></span>
+            <span>💼 <a href="https://linkedin.com/in/iamnk7" target="_blank">linkedin.com/in/iamnk7</a></span>
+            <span>💻 <a href="https://github.com/Iamnk07" target="_blank">github.com/Iamnk07</a></span>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
