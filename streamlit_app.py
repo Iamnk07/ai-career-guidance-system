@@ -130,68 +130,122 @@ if not st.session_state["splash_done"]:
     st.rerun()
 
 # -----------------------------------------------------
-# GLOBAL CSS (MAIN APP)
+# SESSION STATE DEFAULTS
 # -----------------------------------------------------
-st.markdown(
-    """
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+if "response_temperature" not in st.session_state:
+    st.session_state.response_temperature = 0.6
+
+if "theme" not in st.session_state:
+    st.session_state.theme = "dark"   # "dark" or "light"
+
+
+# -----------------------------------------------------
+# THEME CSS
+# -----------------------------------------------------
+def inject_theme_css(theme: str):
+    if theme == "light":
+        bg = "#f3f4f6"
+        text = "#020617"
+        card_bg = "#ffffff"
+        card_border = "rgba(148,163,184,0.5)"
+        response_bg = "#ffffff"
+        response_border = "rgba(148,163,184,0.8)"
+        top_bg = "#e5e7eb"
+    else:  # dark
+        bg = "radial-gradient(circle at top left, #020617 0, #020617 40%, #000000 100%)"
+        text = "#e5e7eb"
+        card_bg = "rgba(15,23,42,0.88)"
+        card_border = "rgba(31,41,55,0.8)"
+        response_bg = "rgba(15,23,42,0.9)"
+        response_border = "rgba(148,163,184,0.4)"
+        top_bg = "rgba(15,23,42,0.85)"
+
+    css = f"""
     <style>
-        .stApp {
-            background: radial-gradient(circle at top left, #020617 0, #020617 40%, #000000 100%);
-            color: #e5e7eb;
+        .stApp {{
+            background: {bg};
+            color: {text};
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-        .top-bar {
+        }}
+        .top-bar {{
             display:flex;
             align-items:center;
             justify-content:space-between;
-            margin-bottom:1rem;
-        }
-        .top-logo {
+            margin-bottom:0.8rem;
+        }}
+        .top-logo {{
             display:inline-flex;
             align-items:center;
             gap:8px;
             padding:4px 11px;
             border-radius:999px;
             border:1px solid rgba(148,163,184,0.4);
-            background:rgba(15,23,42,0.85);
-        }
-        .top-logo-icon {
+            background:{top_bg};
+        }}
+        .top-logo-icon {{
             width:22px;height:22px;border-radius:999px;
             background:radial-gradient(circle at top,#38bdf8 0,#0ea5e9 40%,#0b1120 100%);
             display:flex;align-items:center;justify-content:center;
             font-size:0.9rem;
-        }
-        .top-logo-main {
+        }}
+        .top-logo-main {{
             font-size:0.9rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
-        }
-        .top-logo-sub {
+        }}
+        .top-logo-sub {{
             font-size:0.7rem;color:#9ca3af;
-        }
-        .top-right {
+        }}
+        .top-right {{
             font-size:0.75rem;
             color:#9ca3af;
-        }
-        .card {
-            background:rgba(15,23,42,0.88);
+        }}
+        .card {{
+            background:{card_bg};
             padding:1rem 1.2rem;
             border-radius:18px;
-            border:1px solid rgba(31,41,55,0.8);
-        }
-        .ai-response {
-            background:rgba(15,23,42,0.9);
+            border:1px solid {card_border};
+        }}
+        .ai-response {{
+            background:{response_bg};
             padding:1.1rem 1.2rem;
             border-radius:18px;
-            border:1px solid rgba(148,163,184,0.4);
+            border:1px solid {response_border};
             margin-top:0.8rem;
             font-size:0.95rem;
             line-height:1.55;
-        }
-        .section-title {
+        }}
+        .section-title {{
             font-size:1.05rem;
             font-weight:600;
             margin-bottom:0.5rem;
-        }
-        .resource-chip {
+        }}
+        .sidebar-card {{
+            background:{card_bg};
+            padding:0.8rem 0.9rem;
+            border-radius:14px;
+            border:1px solid {card_border};
+            font-size:0.85rem;
+        }}
+        .sidebar-title {{
+            font-size:0.9rem;
+            font-weight:600;
+            margin-bottom:0.3rem;
+        }}
+        .sidebar-subtitle {{
+            font-size:0.75rem;
+            color:#9ca3af;
+        }}
+        .footer {{
+            margin-top:1.4rem;
+            font-size:0.8rem;
+            color:#9ca3af;
+            text-align:center;
+            border-top:1px solid rgba(31,41,55,0.5);
+            padding-top:0.7rem;
+        }}
+        .resource-chip {{
             display:inline-flex;
             padding:4px 10px;
             border-radius:999px;
@@ -199,28 +253,95 @@ st.markdown(
             margin-right:6px;
             margin-bottom:6px;
             font-size:0.75rem;
-        }
-        .footer {
-            margin-top:1.4rem;
-            font-size:0.8rem;
-            color:#9ca3af;
-            text-align:center;
-            border-top:1px solid rgba(31,41,55,0.8);
-            padding-top:0.7rem;
-        }
+        }}
+        a {{
+            text-decoration:none;
+        }}
+        a:hover {{
+            text-decoration:underline;
+        }}
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+
+inject_theme_css(st.session_state.theme)
 
 # -----------------------------------------------------
-# SESSION STATE
+# SIDEBAR (COLLAPSIBLE)
 # -----------------------------------------------------
-if "history" not in st.session_state:
-    st.session_state.history = []
+with st.sidebar:
+    st.markdown(
+        """
+        <div class="sidebar-card" style="margin-bottom:0.7rem;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.3rem;">
+                <div class="top-logo-icon">N</div>
+                <div>
+                    <div class="sidebar-title">Nexo AI</div>
+                    <div class="sidebar-subtitle">Career Assistant</div>
+                </div>
+            </div>
+            <div style="font-size:0.78rem;">
+                Smart guidance for students and freshers,
+                powered by large language models.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-if "response_temperature" not in st.session_state:
-    st.session_state.response_temperature = 0.6
+    st.markdown(
+        """
+        <div class="sidebar-card" style="margin-bottom:0.7rem;">
+            <div class="sidebar-title">About Niyaz</div>
+            <div style="font-size:0.8rem;">
+                <b>Niyaz Khan</b><br/>
+                B.Tech CSE • Aspiring engineer & builder of Nexo AI.
+            </div>
+            <hr style="border:none;border-top:1px solid rgba(148,163,184,0.4);margin:6px 0 4px 0;">
+            <div style="font-size:0.8rem;line-height:1.5;">
+                📧 <a href="mailto:niyaz.kofficials@gmail.com">niyaz.kofficials@gmail.com</a><br/>
+                💼 <a href="https://linkedin.com/in/iamnk7" target="_blank">linkedin.com/in/iamnk7</a><br/>
+                💻 <a href="https://github.com/Iamnk07" target="_blank">github.com/Iamnk07</a><br/>
+                📱 <a href="tel:+917751931035">+91 7751931035</a>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="sidebar-card" style="margin-bottom:0.7rem;">
+            <div class="sidebar-title">Settings</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    theme_choice = st.radio(
+        "Theme",
+        options=["Dark", "Light"],
+        index=0 if st.session_state.theme == "dark" else 1,
+    )
+    st.session_state.theme = "dark" if theme_choice == "Dark" else "light"
+
+    temp = st.slider(
+        "Creativity (temperature)",
+        min_value=0.0,
+        max_value=1.0,
+        value=float(st.session_state.response_temperature),
+        step=0.1,
+        help="Lower = more strict and deterministic; Higher = more creative.",
+    )
+    st.session_state.response_temperature = temp
+
+    if st.button("Clear history"):
+        st.session_state.history = []
+        st.success("History cleared for this session.")
+
+# re-inject CSS after possible theme change
+inject_theme_css(st.session_state.theme)
 
 # -----------------------------------------------------
 # GROQ CLIENT
@@ -243,7 +364,6 @@ Keep language simple, supportive and specific.
 """
 
 def get_guidance(user_message: str, mode: str):
-    """Call Groq model and return text."""
     completion = client.chat.completions.create(
         model="openai/gpt-oss-20b",
         messages=[
@@ -259,7 +379,7 @@ def get_guidance(user_message: str, mode: str):
     return completion.choices[0].message.content
 
 # -----------------------------------------------------
-# TOP BAR (NEXO AI TEXT LOGO)
+# TOP BAR (NO EMPTY BOXES ANYMORE)
 # -----------------------------------------------------
 st.markdown(
     f"""
@@ -280,10 +400,10 @@ st.markdown(
 )
 
 # -----------------------------------------------------
-# TABS: Career, Interview, Library, History, Settings
+# MAIN TABS
 # -----------------------------------------------------
-tab_career, tab_interview, tab_library, tab_history, tab_settings = st.tabs(
-    ["Career Direction", "Interview Prep", "Library", "History", "Settings"]
+tab_career, tab_interview, tab_library, tab_history = st.tabs(
+    ["Career Direction", "Interview Prep", "Library", "History"]
 )
 
 # -----------------------------------------------------
@@ -344,7 +464,6 @@ Create a step-by-step career direction plan.
 
             st.markdown(f"<div class='ai-response'>{answer}</div>", unsafe_allow_html=True)
 
-            # Save to history
             st.session_state.history.append(
                 {
                     "mode": "Career Direction",
@@ -354,6 +473,8 @@ Create a step-by-step career direction plan.
                     "output": answer,
                 }
             )
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
         st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -442,6 +563,8 @@ Create:
                 }
             )
 
+        st.markdown("</div>", unsafe_allow_html=True)
+
     with right_i:
         st.markdown('<div class="card">', unsafe_allow_html=True)
         st.markdown('<div class="section-title">Checklist</div>', unsafe_allow_html=True)
@@ -461,7 +584,7 @@ Create:
 with tab_library:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Library</div>', unsafe_allow_html=True)
-    st.caption("Curated sections to help you explore common paths. (All text only, no external links.)")
+    st.caption("Curated sections to help you explore common paths. (Static text, no external links from AI.)")
 
     col_l1, col_l2 = st.columns(2)
 
@@ -477,10 +600,10 @@ with tab_library:
   5. Database + basic system design  
 
 - **Data Analyst / Scientist**  
-  1. Python + libraries (pandas, NumPy)  
+  1. Python + pandas/NumPy  
   2. Statistics & probability basics  
   3. SQL  
-  4. Data viz (Matplotlib / Power BI / Tableau)  
+  4. Data visualization  
   5. ML basics (regression, classification, evaluation)
             """
         )
@@ -489,7 +612,7 @@ with tab_library:
         st.markdown("##### Interview Essentials")
         st.markdown(
             """
-- **Core CS areas** (for SDE):  
+- **Core CS areas (for SDE):**  
   DSA, OOP, DBMS, OS, CN basics.  
 
 - **Behavioural questions:**  
@@ -499,10 +622,10 @@ with tab_library:
   - Why this role / company  
 
 - **Projects:**  
-  - Problem → Your approach  
+  - Problem & motivation  
   - Tech stack  
-  - What *you* built  
-  - Challenges & learnings
+  - Your contributions  
+  - Challenges and learnings
             """
         )
 
@@ -517,6 +640,8 @@ with tab_library:
         """,
         unsafe_allow_html=True,
     )
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # HISTORY TAB
@@ -535,29 +660,7 @@ with tab_history:
                 st.markdown(item["output"])
             st.markdown("---")
 
-# -----------------------------------------------------
-# SETTINGS TAB
-# -----------------------------------------------------
-with tab_settings:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Settings</div>', unsafe_allow_html=True)
-
-    st.caption("Adjust how Nexo AI responds.")
-
-    temp = st.slider(
-        "Creativity / exploration level (temperature)",
-        min_value=0.0,
-        max_value=1.0,
-        value=float(st.session_state.response_temperature),
-        step=0.1,
-        help="Lower = more strict and deterministic. Higher = more creative."
-    )
-    st.session_state.response_temperature = temp
-
-    st.markdown("---")
-    if st.button("Clear history"):
-        st.session_state.history = []
-        st.success("History cleared for this session.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
 # FOOTER
