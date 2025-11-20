@@ -25,7 +25,7 @@ if "history" not in st.session_state:
     st.session_state["history"] = []
 
 # -----------------------------------------------------
-# GLOBAL CSS (BANANI-LIKE + NEW PAGE CARDS)
+# GLOBAL CSS (BANANI-LIKE)
 # -----------------------------------------------------
 CSS = """
 <style>
@@ -116,28 +116,28 @@ section[data-testid="stSidebar"] * {
     color:#e5e7eb;
     padding: 2.3rem 2.7rem;
     border-radius:24px;
-    background:rgba(15,23,42,0.98);
+    background:#050821;
     border:1px solid rgba(148,163,184,0.7);
     min-width:320px;
-    max-width:640px;
-    box-shadow:0 24px 60px rgba(0,0,0,0.85);
+    max-width:720px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.9);
     overflow:hidden;
 }
 .splash-gradient-orb-left {
     position:absolute;
     width:340px; height:340px;
     border-radius:999px;
-    background:radial-gradient(circle, rgba(56,189,248,0.9), transparent 65%);
+    background:radial-gradient(circle, rgba(56,189,248,0.8), transparent 65%);
     left:-160px; top:-160px;
-    opacity:0.4;
+    opacity:0.5;
 }
 .splash-gradient-orb-right {
     position:absolute;
     width:340px; height:340px;
     border-radius:999px;
-    background:radial-gradient(circle, rgba(249,115,22,0.9), transparent 65%);
-    right:-180px; bottom:-180px;
-    opacity:0.4;
+    background:radial-gradient(circle, rgba(249,115,22,0.8), transparent 65%);
+    right:-200px; bottom:-200px;
+    opacity:0.5;
 }
 .splash-card-inner {
     position:relative;
@@ -146,9 +146,9 @@ section[data-testid="stSidebar"] * {
     display:inline-flex;
     align-items:center;
     gap:0.4rem;
-    padding:0.2rem 0.9rem;
+    padding:0.25rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.95);
+    background:#020617;
     border:1px solid rgba(148,163,184,0.7);
     font-size:0.75rem;
     margin-bottom:0.9rem;
@@ -160,7 +160,7 @@ section[data-testid="stSidebar"] * {
 }
 .splash-welcome {
     font-family:"Baloo 2", system-ui;
-    font-size:2.4rem;
+    font-size:2.7rem;
     font-weight:800;
     letter-spacing:0.18em;
     margin-bottom:0.5rem;
@@ -188,12 +188,12 @@ section[data-testid="stSidebar"] * {
     margin-bottom:0.9rem;
 }
 .splash-btn-primary {
-    padding:0.45rem 1.35rem;
+    padding:0.5rem 1.5rem;
     border-radius:999px;
     border:none;
-    background:#22c55e;
-    color:#020617;
-    font-size:0.85rem;
+    background:linear-gradient(135deg,#4f46e5,#22c55e);
+    color:#f9fafb;
+    font-size:0.9rem;
     font-weight:600;
 }
 .splash-btn-secondary {
@@ -217,7 +217,7 @@ section[data-testid="stSidebar"] * {
 .splash-ready-pill {
     padding:0.25rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.95);
+    background:#020617;
     border:1px solid rgba(34,197,94,0.7);
     font-size:0.75rem;
 }
@@ -226,12 +226,12 @@ section[data-testid="stSidebar"] * {
 
 .home-main-card,
 .page-card {
-    background:rgba(15,23,42,0.97);
+    background:#050821;
     border-radius:24px;
     border:1px solid rgba(148,163,184,0.45);
     padding:1.7rem 1.9rem;
     color:#e5e7eb;
-    box-shadow:0 22px 55px rgba(0,0,0,0.85);
+    box-shadow:0 22px 55px rgba(0,0,0,0.9);
 }
 
 .home-pill {
@@ -240,7 +240,7 @@ section[data-testid="stSidebar"] * {
     gap:0.4rem;
     padding:0.18rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.95);
+    background:#020617;
     border:1px solid rgba(148,163,184,0.6);
     font-size:0.75rem;
     margin-bottom:0.7rem;
@@ -272,7 +272,7 @@ section[data-testid="stSidebar"] * {
 .home-feature-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.5);
-    background:rgba(15,23,42,0.96);
+    background:#020617;
     padding:0.9rem;
     font-size:0.82rem;
 }
@@ -307,7 +307,7 @@ section[data-testid="stSidebar"] * {
 .home-card-ready-pill {
     padding:0.2rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.96);
+    background:#020617;
     border:1px solid rgba(34,197,94,0.7);
 }
 
@@ -336,7 +336,7 @@ section[data-testid="stSidebar"] * {
 .top-career-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.45);
-    background:rgba(15,23,42,0.97);
+    background:#020617;
     padding:0.9rem;
     font-size:0.8rem;
     color:#e5e7eb;
@@ -363,7 +363,7 @@ section[data-testid="stSidebar"] * {
     width:100%;
     height:8px;
     border-radius:999px;
-    background:rgba(15,23,42,0.9);
+    background:#020617;
     overflow:hidden;
     margin-bottom:0.3rem;
 }
@@ -386,7 +386,7 @@ section[data-testid="stSidebar"] * {
 .career-details-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.45);
-    background:rgba(15,23,42,0.97);
+    background:#020617;
     padding:0.9rem;
     font-size:0.8rem;
     color:#e5e7eb;
@@ -402,7 +402,7 @@ section[data-testid="stSidebar"] * {
 /* form inputs inside cards */
 .page-card .stTextInput > div > input,
 .page-card .stTextArea > div > textarea {
-    background: rgba(15,23,42,0.9);
+    background: #020617;
     border-radius: 10px;
     border: 1px solid rgba(148,163,184,0.6);
     color: #e5e7eb;
