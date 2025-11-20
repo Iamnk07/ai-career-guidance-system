@@ -25,15 +25,17 @@ if "history" not in st.session_state:
     st.session_state["history"] = []
 
 # -----------------------------------------------------
-# GLOBAL CSS (BANANI-STYLE BACKGROUND + CARDS)
+# GLOBAL CSS (BANANI-LIKE)
 # -----------------------------------------------------
 CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Fredoka:wght@400;600;700&display=swap');
+
 body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Background like Banani prototype */
+/* App background: gradient + blurred circles */
 .stApp {
     background: radial-gradient(circle at 10% 20%, #1d4ed8 0, transparent 55%),
                 radial-gradient(circle at 80% 80%, #22c55e 0, transparent 55%),
@@ -44,7 +46,7 @@ body {
     background: transparent;
 }
 
-/* Subtle grid overlay */
+/* subtle grid overlay */
 [data-testid="stAppViewContainer"]::before {
     content: "";
     position: fixed;
@@ -53,18 +55,18 @@ body {
         linear-gradient(rgba(15,23,42,0.35) 1px, transparent 1px),
         linear-gradient(90deg, rgba(15,23,42,0.35) 1px, transparent 1px);
     background-size: 60px 60px;
-    opacity: 0.35;
+    opacity: 0.32;
     pointer-events: none;
     z-index: -1;
 }
 
-/* Main container */
+/* Container padding */
 .block-container {
     padding-top: 1.0rem;
     padding-bottom: 3rem;
 }
 
-/* Dark sidebar */
+/* Sidebar (dark) */
 section[data-testid="stSidebar"] {
     background: #020617;
     border-right: 1px solid #111827;
@@ -87,14 +89,15 @@ section[data-testid="stSidebar"] * {
     margin: 0.4rem 0 0.6rem 0;
 }
 
-/* Root wrapper for pages */
+/* Root wrapper */
 .app-root {
     max-width: 1180px;
     margin: 0 auto;
     padding: 0.5rem 1rem 4rem 1rem;
 }
 
-/* Splash */
+/* ---------------- SPLASH ----------------- */
+
 .splash-layer {
     position: fixed;
     inset: 0;
@@ -111,29 +114,29 @@ section[data-testid="stSidebar"] * {
     position: relative;
     text-align:left;
     color:#e5e7eb;
-    padding: 2.2rem 2.6rem;
-    border-radius:20px;
-    background:rgba(15,23,42,0.97);
+    padding: 2.3rem 2.7rem;
+    border-radius:24px;
+    background:rgba(15,23,42,0.98);
     border:1px solid rgba(148,163,184,0.7);
-    min-width:280px;
-    max-width:520px;
-    box-shadow:0 24px 60px rgba(0,0,0,0.75);
+    min-width:320px;
+    max-width:640px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.85);
     overflow:hidden;
 }
 .splash-gradient-orb-left {
     position:absolute;
-    width:260px; height:260px;
+    width:340px; height:340px;
     border-radius:999px;
     background:radial-gradient(circle, rgba(56,189,248,0.9), transparent 65%);
-    left:-120px; top:-120px;
-    opacity:0.45;
+    left:-160px; top:-160px;
+    opacity:0.4;
 }
 .splash-gradient-orb-right {
     position:absolute;
-    width:260px; height:260px;
+    width:340px; height:340px;
     border-radius:999px;
     background:radial-gradient(circle, rgba(249,115,22,0.9), transparent 65%);
-    right:-140px; bottom:-140px;
+    right:-180px; bottom:-180px;
     opacity:0.4;
 }
 .splash-card-inner {
@@ -143,33 +146,35 @@ section[data-testid="stSidebar"] * {
     display:inline-flex;
     align-items:center;
     gap:0.4rem;
-    padding:0.15rem 0.7rem;
+    padding:0.2rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.9);
-    border:1px solid rgba(148,163,184,0.5);
+    background:rgba(15,23,42,0.95);
+    border:1px solid rgba(148,163,184,0.7);
     font-size:0.75rem;
-    margin-bottom:0.8rem;
+    margin-bottom:0.9rem;
 }
 .splash-pill-dot {
-    width:9px; height:9px;
+    width:10px; height:10px;
     border-radius:999px;
     background:#22c55e;
 }
 .splash-welcome {
-    font-size:2.1rem;
+    font-family:"Baloo 2", system-ui;
+    font-size:2.4rem;
     font-weight:800;
-    letter-spacing:0.15em;
-    margin-bottom:0.4rem;
+    letter-spacing:0.18em;
+    margin-bottom:0.5rem;
 }
 .splash-title-main {
-    font-size:1.2rem;
+    font-family:"Fredoka", system-ui;
+    font-size:1.4rem;
     font-weight:700;
     margin-bottom:0.3rem;
 }
 .splash-subline {
-    font-size:0.9rem;
-    color:#cbd5f5;
-    margin-bottom:0.9rem;
+    font-size:0.95rem;
+    color:#e5e7eb;
+    margin-bottom:0.7rem;
 }
 .splash-desc {
     font-size:0.8rem;
@@ -183,7 +188,7 @@ section[data-testid="stSidebar"] * {
     margin-bottom:0.9rem;
 }
 .splash-btn-primary {
-    padding:0.45rem 1.2rem;
+    padding:0.45rem 1.35rem;
     border-radius:999px;
     border:none;
     background:#22c55e;
@@ -210,46 +215,48 @@ section[data-testid="stSidebar"] * {
     color:#9ca3af;
 }
 .splash-ready-pill {
-    padding:0.2rem 0.8rem;
+    padding:0.25rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.9);
+    background:rgba(15,23,42,0.95);
     border:1px solid rgba(34,197,94,0.7);
     font-size:0.75rem;
 }
 
-/* Home main card (like Banani screen) */
+/* -------------- HOME MAIN CARD ---------------- */
+
 .home-main-card {
-    background:rgba(15,23,42,0.95);
-    border-radius:20px;
+    background:rgba(15,23,42,0.97);
+    border-radius:24px;
     border:1px solid rgba(148,163,184,0.45);
-    padding:1.6rem 1.8rem;
+    padding:1.7rem 1.9rem;
     color:#e5e7eb;
-    box-shadow:0 22px 55px rgba(0,0,0,0.75);
+    box-shadow:0 22px 55px rgba(0,0,0,0.85);
 }
 .home-pill {
     display:inline-flex;
     align-items:center;
     gap:0.4rem;
-    padding:0.18rem 0.8rem;
+    padding:0.18rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.9);
+    background:rgba(15,23,42,0.95);
     border:1px solid rgba(148,163,184,0.6);
     font-size:0.75rem;
-    margin-bottom:0.6rem;
+    margin-bottom:0.7rem;
 }
 .home-pill-dot {
-    width:8px; height:8px;
+    width:9px; height:9px;
     border-radius:999px;
     background:#22c55e;
 }
 .home-title-main {
-    font-size:1.3rem;
+    font-family:"Fredoka", system-ui;
+    font-size:1.4rem;
     font-weight:700;
-    margin-bottom:0.45rem;
+    margin-bottom:0.4rem;
 }
 .home-subline {
-    font-size:0.9rem;
-    color:#cbd5f5;
+    font-size:0.95rem;
+    color:#e5e7eb;
     margin-bottom:0.4rem;
 }
 .home-desc {
@@ -258,22 +265,18 @@ section[data-testid="stSidebar"] * {
     max-width:640px;
     margin-bottom:1.2rem;
 }
-.home-feature-row {
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap:1rem;
-    margin-bottom:1.1rem;
-}
+
+/* feature cards row */
 .home-feature-card {
-    border-radius:12px;
-    border:1px solid rgba(148,163,184,0.4);
-    background:rgba(15,23,42,0.94);
+    border-radius:14px;
+    border:1px solid rgba(148,163,184,0.5);
+    background:rgba(15,23,42,0.96);
     padding:0.9rem;
-    font-size:0.85rem;
+    font-size:0.82rem;
 }
 .home-feature-title {
     font-weight:600;
-    margin-bottom:0.25rem;
+    margin-bottom:0.2rem;
 }
 .home-feature-desc {
     font-size:0.78rem;
@@ -288,7 +291,6 @@ section[data-testid="stSidebar"] * {
     color:#020617;
     font-size:0.8rem;
     font-weight:600;
-    cursor:pointer;
 }
 .home-card-footer {
     display:flex;
@@ -298,16 +300,16 @@ section[data-testid="stSidebar"] * {
     gap:0.5rem;
     font-size:0.75rem;
     color:#9ca3af;
-    margin-top:0.4rem;
+    margin-top:0.5rem;
 }
 .home-card-ready-pill {
-    padding:0.2rem 0.8rem;
+    padding:0.2rem 0.9rem;
     border-radius:999px;
-    background:rgba(15,23,42,0.9);
+    background:rgba(15,23,42,0.96);
     border:1px solid rgba(34,197,94,0.7);
 }
 
-/* Section under card */
+/* section titles */
 .section {
     margin: 1.8rem 0;
 }
@@ -323,7 +325,7 @@ section[data-testid="stSidebar"] * {
     margin-bottom:0.6rem;
 }
 
-/* Top careers row */
+/* top careers row */
 .top-careers-grid {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -332,7 +334,7 @@ section[data-testid="stSidebar"] * {
 .top-career-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.45);
-    background:rgba(15,23,42,0.95);
+    background:rgba(15,23,42,0.97);
     padding:0.9rem;
     font-size:0.8rem;
     color:#e5e7eb;
@@ -373,7 +375,7 @@ section[data-testid="stSidebar"] * {
     color:#a5b4fc;
 }
 
-/* Career details section */
+/* career details row */
 .career-details-grid {
     display:grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -382,7 +384,7 @@ section[data-testid="stSidebar"] * {
 .career-details-card {
     border-radius:14px;
     border:1px solid rgba(148,163,184,0.45);
-    background:rgba(15,23,42,0.96);
+    background:rgba(15,23,42,0.97);
     padding:0.9rem;
     font-size:0.8rem;
     color:#e5e7eb;
@@ -395,7 +397,7 @@ section[data-testid="stSidebar"] * {
     margin-bottom:0.2rem;
 }
 
-/* Footer */
+/* footer */
 .footer {
     background:#020617;
     color:#e5e7eb;
@@ -428,13 +430,13 @@ section[data-testid="stSidebar"] * {
     text-decoration:underline;
 }
 
-/* Mobile tweaks */
+/* mobile */
 @media (max-width: 640px) {
     .app-root {
         padding:0.6rem 0.6rem 3rem 0.6rem;
     }
     .home-main-card {
-        padding:1.1rem 1.1rem;
+        padding:1.1rem 1.2rem;
     }
 }
 </style>
@@ -442,7 +444,7 @@ section[data-testid="stSidebar"] * {
 st.markdown(CSS, unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# SPLASH (WELCOME SCREEN)
+# SPLASH (WELCOME)
 # -----------------------------------------------------
 def show_splash():
     html = """
@@ -539,7 +541,7 @@ Provide:
 
 1. A short summary of their profile  
 2. 3–5 suitable career paths  
-3. A simple "career chart" style text, like:
+3. A simple "career chart" text:
    - Stage 1: Where they are now
    - Stage 2: Next 1–2 roles
    - Stage 3: Senior roles
@@ -583,7 +585,7 @@ with st.sidebar:
 def page_home():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
 
-    # Main card like your Banani screen
+    # main card
     st.markdown('<div class="home-main-card">', unsafe_allow_html=True)
     st.markdown(
         """
@@ -602,20 +604,20 @@ def page_home():
     st.markdown(
         """
         <div class="home-desc">
-          Your AI-powered companion to help you make informed career decisions, grow with confidence,
-          and navigate an ever-changing world of work.
+          A smart, AI-powered guide to help you explore options, make informed career decisions,
+          and grow with confidence in a rapidly changing world of work.
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Feature cards row
     col1, col2 = st.columns(2, gap="medium")
+
     with col1:
         st.markdown('<div class="home-feature-card">', unsafe_allow_html=True)
         st.markdown('<div class="home-feature-title">Career Chart</div>', unsafe_allow_html=True)
         st.markdown(
-            '<div class="home-feature-desc">Ask questions, explore options, and talk to your AI mentor about roles, skills, and next steps.</div>',
+            '<div class="home-feature-desc">Ask questions, explore options, and talk to your AI mentor about roles, skills, and next steps in your path.</div>',
             unsafe_allow_html=True,
         )
         if st.button("Get Career Chart", key="home_chart_btn"):
@@ -644,10 +646,9 @@ def page_home():
         """,
         unsafe_allow_html=True,
     )
+    st.markdown("</div>", unsafe_allow_html=True)  # card
 
-    st.markdown("</div>", unsafe_allow_html=True)  # close home-main-card
-
-    # Top careers section
+    # Top careers row
     st.markdown('<div class="section">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Top Careers for You</div>', unsafe_allow_html=True)
     st.markdown(
@@ -655,7 +656,6 @@ def page_home():
         unsafe_allow_html=True,
     )
 
-    # Cards row
     st.markdown(
         """
         <div class="top-careers-grid">
@@ -666,7 +666,7 @@ def page_home():
             </div>
             <div class="top-career-meta">Salary: 6–24 LPA · Skill growth</div>
             <div class="progress-bar"><div class="progress-fill" style="width:88%;"></div></div>
-            <div class="top-career-tag">Growth: 🚀 Strong demand, product & service companies.</div>
+            <div class="top-career-tag">🚀 Strong demand across product & service companies.</div>
           </div>
 
           <div class="top-career-card">
@@ -676,7 +676,7 @@ def page_home():
             </div>
             <div class="top-career-meta">Salary: 5–18 LPA · Work–life balance</div>
             <div class="progress-bar"><div class="progress-fill" style="width:82%;"></div></div>
-            <div class="top-career-tag">Balanced: 📊 Great for analytical, business-leaning profiles.</div>
+            <div class="top-career-tag">📊 Great for analytical & business-leaning profiles.</div>
           </div>
 
           <div class="top-career-card">
@@ -686,51 +686,51 @@ def page_home():
             </div>
             <div class="top-career-meta">Salary: 10–35 LPA · Leadership track</div>
             <div class="progress-bar"><div class="progress-fill" style="width:78%;"></div></div>
-            <div class="top-career-tag">Leadership: 🧭 Combines tech, business & communication.</div>
+            <div class="top-career-tag">🧭 Combines tech, business & communication.</div>
           </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown("</div>", unsafe_allow_html=True)  # section
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    # Career details & next steps
+    # career details section
     st.markdown('<div class="section">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Career details & next steps</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="section-sub">Why these careers work for you and what to do next.</div>',
+        '<div class="section-sub">Why these careers fit you, and what you should do now.</div>',
         unsafe_allow_html=True,
     )
 
-    st.markdown('<div class="career-details-grid">', unsafe_allow_html=True)
     st.markdown(
         """
-        <div class="career-details-card">
-          <strong>Why these careers match you</strong>
-          <ul>
-            <li>Align well with core skills and learning style.</li>
-            <li>Strong long-term demand across industries.</li>
-            <li>Clear roadmap from beginner to advanced levels.</li>
-          </ul>
-        </div>
-        <div class="career-details-card">
-          <strong>What you should do next</strong>
-          <ul>
-            <li>Start with 2–3 core skills suggested by the AI guide.</li>
-            <li>Follow a mix of online courses and small projects.</li>
-            <li>Build a small portfolio or GitHub repo to showcase progress.</li>
-          </ul>
+        <div class="career-details-grid">
+          <div class="career-details-card">
+            <strong>Why these careers match you</strong>
+            <ul>
+              <li>Align with common CS / IT skills and learning style.</li>
+              <li>Strong long-term demand in India & globally.</li>
+              <li>Clear roadmap from beginner projects to advanced roles.</li>
+            </ul>
+          </div>
+          <div class="career-details-card">
+            <strong>What you should do next</strong>
+            <ul>
+              <li>Pick 2–3 core skills and build consistency for 2–3 months.</li>
+              <li>Follow a curated playlist of tutorials + practice projects.</li>
+              <li>Publish your work on GitHub & LinkedIn to build proof.</li>
+            </ul>
+          </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown("</div>", unsafe_allow_html=True)  # grid
-    st.markdown("</div>", unsafe_allow_html=True)  # section
+    st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)  # app-root
 
 # -----------------------------------------------------
-# CAREER CHART PAGE (AI GENERATED)
+# CAREER CHART PAGE
 # -----------------------------------------------------
 def page_career_chart():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -756,7 +756,7 @@ def page_career_chart():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# CAREER GUIDE PAGE (FULL GUIDANCE)
+# CAREER GUIDE (FULL REPORT)
 # -----------------------------------------------------
 def page_career_guide():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -796,7 +796,7 @@ def page_career_guide():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# LIBRARY PAGE
+# LIBRARY
 # -----------------------------------------------------
 def page_library():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -814,7 +814,7 @@ def page_library():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# HISTORY PAGE
+# HISTORY
 # -----------------------------------------------------
 def page_history():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -838,7 +838,7 @@ def page_history():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# SETTINGS PAGE
+# SETTINGS
 # -----------------------------------------------------
 def page_settings():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -851,7 +851,7 @@ def page_settings():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# ABOUT PAGE
+# ABOUT
 # -----------------------------------------------------
 def page_about():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -873,7 +873,7 @@ It uses **Large Language Models (LLMs)** via **Groq**, with a modern
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# CONTACT PAGE
+# CONTACT
 # -----------------------------------------------------
 def page_contact():
     st.markdown('<div class="app-root">', unsafe_allow_html=True)
@@ -898,7 +898,7 @@ def page_contact():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -----------------------------------------------------
-# FOOTER (Quick Links + Contact + Social Icons)
+# FOOTER
 # -----------------------------------------------------
 def render_footer():
     st.markdown(
