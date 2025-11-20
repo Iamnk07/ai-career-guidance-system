@@ -56,6 +56,9 @@ if not st.session_state["splash_done"]:
             color: transparent;
             margin-bottom: 10px;
             animation: fadeInUp 1.3s ease-out forwards;
+            text-shadow: 0 0 14px rgba(56,189,248,0.8),
+                         0 0 22px rgba(168,85,247,0.7),
+                         0 0 30px rgba(249,115,22,0.6);
         }
         .splash-sub {
             font-size: 1rem;
@@ -70,7 +73,7 @@ if not st.session_state["splash_done"]:
 
     <div class="splash-root">
         <div class="splash-top">
-            <div style="font-size:1.1rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">
+            <div style="font-size:1.1rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;">
                 Nexo AI
             </div>
         </div>
@@ -98,7 +101,7 @@ if "theme" not in st.session_state:
     st.session_state.theme = "dark"  # "dark" or "light"
 
 # -----------------------------------------------------
-# THEME CSS
+# THEME CSS (DARK + LIGHT + RESPONSIVE + NEON LOGO)
 # -----------------------------------------------------
 def inject_theme_css(theme: str):
     if theme == "light":
@@ -127,17 +130,26 @@ def inject_theme_css(theme: str):
             color: {text};
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }}
+
+        /* TOP BAR WITH NEON GRADIENT LOGO */
         .top-bar {{
             display:flex;
-            align-items:center;
+            align-items:flex-start;
             justify-content:space-between;
             margin-bottom:0.8rem;
+            gap:0.5rem;
         }}
         .top-brand-title {{
-            font-size:1.3rem;
-            font-weight:700;
-            letter-spacing:0.12em;
+            font-size:1.4rem;
+            font-weight:800;
+            letter-spacing:0.14em;
             text-transform:uppercase;
+            background: linear-gradient(120deg, #38bdf8, #a855f7, #f97316);
+            -webkit-background-clip:text;
+            color: transparent;
+            text-shadow: 0 0 12px rgba(56,189,248,0.9),
+                         0 0 20px rgba(168,85,247,0.8),
+                         0 0 30px rgba(249,115,22,0.7);
         }}
         .top-brand-sub {{
             font-size:0.78rem;
@@ -146,7 +158,10 @@ def inject_theme_css(theme: str):
         .top-right {{
             font-size:0.8rem;
             color:{muted};
+            text-align:right;
         }}
+
+        /* CARDS */
         .card {{
             background:{card_bg};
             padding:1rem 1.2rem;
@@ -167,14 +182,8 @@ def inject_theme_css(theme: str):
             font-weight:600;
             margin-bottom:0.4rem;
         }}
-        .footer {{
-            margin-top:1.5rem;
-            font-size:0.8rem;
-            color:{muted};
-            text-align:center;
-            border-top:1px solid rgba(148,163,184,0.4);
-            padding-top:0.7rem;
-        }}
+
+        /* LIBRARY CHIPS */
         .resource-chip {{
             display:inline-flex;
             padding:4px 10px;
@@ -184,16 +193,54 @@ def inject_theme_css(theme: str):
             margin-bottom:6px;
             font-size:0.75rem;
         }}
-        /* highlight for active tab (underline color) */
+
+        /* FOOTER */
+        .footer {{
+            margin-top:1.5rem;
+            font-size:0.8rem;
+            color:{muted};
+            text-align:center;
+            border-top:1px solid rgba(148,163,184,0.4);
+            padding-top:0.7rem;
+        }}
+
+        /* TABS */
         .stTabs [data-baseweb="tab-list"] {{
             gap: 0.2rem;
+            overflow-x:auto;
         }}
         .stTabs [data-baseweb="tab"] {{
-            padding: 0.5rem 0.9rem;
+            padding: 0.4rem 0.9rem;
+            font-size:0.88rem;
         }}
         .stTabs [data-baseweb="tab-highlight"] {{
             background-color: {tab_indicator};
         }}
+
+        /* REMOVE RANDOM EMPTY BOXES (empty divs in columns) */
+        div[data-testid="column"] > div > div:empty {{
+            display:none !important;
+            padding:0 !important;
+            margin:0 !important;
+            border:none !important;
+            background:transparent !important;
+        }}
+
+        /* RESPONSIVE: MOBILE LAYOUT */
+        @media (max-width: 768px) {{
+            .top-bar {{
+                flex-direction:column;
+                align-items:flex-start;
+            }}
+            .card {{
+                padding:0.9rem 0.9rem;
+                border-radius:14px;
+            }}
+            .ai-response {{
+                padding:0.9rem 0.9rem;
+            }}
+        }}
+
         a {{
             text-decoration:none;
         }}
@@ -213,12 +260,7 @@ inject_theme_css(st.session_state.theme)
 with st.sidebar:
     st.markdown("### Nexo AI")
     st.caption("Career guidance assistant built by Niyaz.")
-
-    nav = st.radio(
-        "Navigation",
-        ["Home", "About", "Contact", "Settings"],
-        index=0,
-    )
+    nav = st.radio("Navigation", ["Home", "About", "Contact", "Settings"], index=0)
 
 # -----------------------------------------------------
 # GROQ CLIENT & LLM
@@ -245,10 +287,7 @@ def get_guidance(user_message: str, mode: str):
         model="openai/gpt-oss-20b",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": f"Mode: {mode}\n\n{user_message}",
-            },
+            {"role": "user", "content": f"Mode: {mode}\n\n{user_message}"},
         ],
         temperature=st.session_state.response_temperature,
         max_tokens=2048,
@@ -256,7 +295,7 @@ def get_guidance(user_message: str, mode: str):
     return completion.choices[0].message.content
 
 # -----------------------------------------------------
-# TOP BAR (ONLY TEXT LOGO, NO BOX)
+# TOP BAR
 # -----------------------------------------------------
 st.markdown(
     f"""
@@ -274,35 +313,27 @@ st.markdown(
 )
 
 # =====================================================
-# MAIN CONTENT ROUTING BASED ON SIDEBAR NAV
+# MAIN CONTENT ROUTING
 # =====================================================
 
-# -----------------------------------------------------
-# NAV: HOME  ->  TABS
-# -----------------------------------------------------
+# ----------------------- HOME ------------------------
 if nav == "Home":
     tab_career, tab_interview, tab_library, tab_history = st.tabs(
         ["Career Direction", "Interview Prep", "Library", "History"]
     )
 
-    # ---------- CAREER DIRECTION ----------
+    # ----- CAREER DIRECTION -----
     with tab_career:
         left, right = st.columns([0.63, 0.37])
 
         with left:
             st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="section-title">Career Direction</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown('<div class="section-title">Career Direction</div>', unsafe_allow_html=True)
             st.caption("Describe your current situation so Nexo AI can suggest a path.")
 
             with st.form("career_form"):
                 name = st.text_input("Name (optional)", placeholder="Niyaz Khan")
-                education = st.text_input(
-                    "Education",
-                    placeholder="B.Tech CSE, Final year",
-                )
+                education = st.text_input("Education", placeholder="B.Tech CSE, Final year")
                 skills = st.text_area(
                     "What skills / technologies do you know?",
                     placeholder="e.g. Python, DSA, HTML/CSS, JS, basic ML…",
@@ -342,10 +373,7 @@ Create a step-by-step career direction plan.
                     except Exception as e:
                         answer = f"❌ Error while contacting the model:\n\n`{e}`"
 
-                st.markdown(
-                    f"<div class='ai-response'>{answer}</div>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown(f"<div class='ai-response'>{answer}</div>", unsafe_allow_html=True)
 
                 st.session_state.history.append(
                     {
@@ -361,10 +389,7 @@ Create a step-by-step career direction plan.
 
         with right:
             st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="section-title">Quick tips</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown('<div class="section-title">Quick tips</div>', unsafe_allow_html=True)
             st.markdown(
                 """
 - Be honest about your **current level**.  
@@ -375,33 +400,22 @@ Create a step-by-step career direction plan.
             )
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # ---------- INTERVIEW PREP ----------
+    # ----- INTERVIEW PREP -----
     with tab_interview:
         left_i, right_i = st.columns([0.63, 0.37])
 
         with left_i:
             st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="section-title">Interview Preparation</div>',
-                unsafe_allow_html=True,
-            )
-            st.caption(
-                "Get topics, strategy and sample questions for your next interview."
-            )
+            st.markdown('<div class="section-title">Interview Preparation</div>', unsafe_allow_html=True)
+            st.caption("Get topics, strategy and sample questions for your next interview.")
 
             with st.form("interview_form"):
-                role = st.text_input(
-                    "Target role",
-                    placeholder="e.g. SDE-1, Data Analyst, DevOps Engineer…",
-                )
+                role = st.text_input("Target role", placeholder="e.g. SDE-1, Data Analyst, DevOps Engineer…")
                 company = st.text_input(
                     "Company / type of company",
                     placeholder="e.g. Product company, TCS NQT, Infosys, JP Morgan virtual, any…",
                 )
-                experience = st.text_input(
-                    "Experience level",
-                    placeholder="Final year / Fresher / 1 year exp…",
-                )
+                experience = st.text_input("Experience level", placeholder="Final year / Fresher / 1 year exp…")
                 strong_areas = st.text_area(
                     "Strong areas",
                     placeholder="e.g. DSA, DBMS, projects in web dev / ML, communication…",
@@ -417,9 +431,7 @@ Create a step-by-step career direction plan.
                     placeholder="e.g. TCS NQT on 5 Dec, JP Morgan test, college placement drive…",
                 )
 
-                submit_interview = st.form_submit_button(
-                    "Generate Interview Plan 🎙️"
-                )
+                submit_interview = st.form_submit_button("Generate Interview Plan 🎙️")
 
             if submit_interview:
                 user_msg_int = f"""
@@ -442,10 +454,7 @@ Create:
                     except Exception as e:
                         ans_int = f"❌ Error while contacting the model:\n\n`{e}`"
 
-                st.markdown(
-                    f"<div class='ai-response'>{ans_int}</div>",
-                    unsafe_allow_html=True,
-                )
+                st.markdown(f"<div class='ai-response'>{ans_int}</div>", unsafe_allow_html=True)
 
                 st.session_state.history.append(
                     {
@@ -461,10 +470,7 @@ Create:
 
         with right_i:
             st.markdown('<div class="card">', unsafe_allow_html=True)
-            st.markdown(
-                '<div class="section-title">Checklist</div>',
-                unsafe_allow_html=True,
-            )
+            st.markdown('<div class="section-title">Checklist</div>', unsafe_allow_html=True)
             st.markdown(
                 """
 - At least **1–2 projects** you can explain well.  
@@ -475,13 +481,10 @@ Create:
             )
             st.markdown("</div>", unsafe_allow_html=True)
 
-    # ---------- LIBRARY ----------
+    # ----- LIBRARY -----
     with tab_library:
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="section-title">Library</div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown('<div class="section-title">Library</div>', unsafe_allow_html=True)
         st.caption("Official docs and high-quality learning resources.")
 
         col_l1, col_l2 = st.columns(2)
@@ -491,7 +494,7 @@ Create:
             st.markdown(
                 """
 - [Python Official Docs](https://docs.python.org/3/)  
-- [JavaScript MDN Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
+- [JavaScript – MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript)  
 - [React Official Docs](https://react.dev/)  
 - [Node.js Docs](https://nodejs.org/en/docs)  
 - [HTML & CSS – MDN](https://developer.mozilla.org/en-US/docs/Web)  
@@ -505,8 +508,8 @@ Create:
 - [pandas Documentation](https://pandas.pydata.org/docs/)  
 - [NumPy Docs](https://numpy.org/doc/)  
 - [Scikit-learn Docs](https://scikit-learn.org/stable/)  
-- [Google Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course)  
-- [IBM Data Science Learning Path](https://www.ibm.com/training/data-science)
+- [Google ML Crash Course](https://developers.google.com/machine-learning/crash-course)  
+- [IBM Data Science Path](https://www.ibm.com/training/data-science)
                 """
             )
 
@@ -514,7 +517,7 @@ Create:
             st.markdown("##### Cloud / DevOps")
             st.markdown(
                 """
-- [AWS Documentation](https://docs.aws.amazon.com/)  
+- [AWS Docs](https://docs.aws.amazon.com/)  
 - [Azure Docs](https://learn.microsoft.com/azure/)  
 - [Google Cloud Docs](https://cloud.google.com/docs)  
 - [Docker Docs](https://docs.docker.com/)  
@@ -522,36 +525,29 @@ Create:
                 """
             )
 
-            st.markdown("##### Coding Practice & CS")
+            st.markdown("##### Coding & Aptitude")
             st.markdown(
                 """
 - [LeetCode](https://leetcode.com/)  
 - [GeeksforGeeks](https://www.geeksforgeeks.org/)  
 - [HackerRank](https://www.hackerrank.com/)  
 - [NPTEL Courses](https://nptel.ac.in/)  
-- [TCS NQT Prep (Official)](https://learning.tcsionhub.in/hub/national-qualifier-test)
+- [TCS NQT Prep](https://learning.tcsionhub.in/hub/national-qualifier-test)
                 """
             )
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ---------- HISTORY ----------
+    # ----- HISTORY -----
     with tab_history:
         st.markdown('<div class="card">', unsafe_allow_html=True)
-        st.markdown(
-            '<div class="section-title">History</div>',
-            unsafe_allow_html=True,
-        )
+        st.markdown('<div class="section-title">History</div>', unsafe_allow_html=True)
 
         if not st.session_state.history:
-            st.info(
-                "No history yet. Use **Career Direction** or **Interview Prep** and results will appear here."
-            )
+            st.info("No history yet. Use **Career Direction** or **Interview Prep** and results will appear here.")
         else:
             for i, item in enumerate(reversed(st.session_state.history), start=1):
-                st.markdown(
-                    f"**#{i} – {item['mode']}**  ·  _{item['timestamp']}_"
-                )
+                st.markdown(f"**#{i} – {item['mode']}**  ·  _{item['timestamp']}_")
                 st.caption(item.get("summary", ""))
                 with st.expander("View response"):
                     st.markdown(item["output"])
@@ -559,9 +555,7 @@ Create:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-# -----------------------------------------------------
-# NAV: ABOUT
-# -----------------------------------------------------
+# ----------------------- ABOUT ------------------------
 elif nav == "About":
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">About Nexo AI</div>', unsafe_allow_html=True)
@@ -590,9 +584,7 @@ It helps students and freshers:
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-# -----------------------------------------------------
-# NAV: CONTACT
-# -----------------------------------------------------
+# ----------------------- CONTACT ----------------------
 elif nav == "Contact":
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Contact</div>', unsafe_allow_html=True)
@@ -607,9 +599,7 @@ elif nav == "Contact":
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
-# -----------------------------------------------------
-# NAV: SETTINGS
-# -----------------------------------------------------
+# ----------------------- SETTINGS ---------------------
 elif nav == "Settings":
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">Settings</div>', unsafe_allow_html=True)
